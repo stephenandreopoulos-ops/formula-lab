@@ -1,0 +1,3109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formula Lab — Mr. Andreopoulos | East York CI</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg: #f0f4ff;
+  --surface: #ffffff;
+  --surface2: #f8faff;
+  --border: #dde3f5;
+  --border2: #c8d0ee;
+  --green: #16a34a;
+  --green-bg: #dcfce7;
+  --green-border: #86efac;
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
+  --blue-border: #93c5fd;
+  --red: #dc2626;
+  --red-bg: #fee2e2;
+  --red-border: #fca5a5;
+  --yellow: #d97706;
+  --yellow-bg: #fef3c7;
+  --text: #1e293b;
+  --text2: #475569;
+  --muted: #94a3b8;
+  --header-bg: #e8edf8;
+  --cell-bg: #ffffff;
+  --cell-selected: #dbeafe;
+  --cell-range: #eff6ff;
+  --cell-highlight: #dcfce7;
+  --accent: #4f46e5;
+  --accent-light: #eef2ff;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.06);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(79,70,229,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(37,99,235,0.05) 0%, transparent 50%);
+}
+
+/* ── HEADER ── */
+.app-header {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow);
+}
+.logo {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 900; font-size: 1.2rem; color: var(--accent);
+  text-decoration: none;
+}
+.logo-icon {
+  width: 34px; height: 34px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; font-weight: 700;
+}
+.logo-title { font-size: 1.05rem; font-weight: 900; color: var(--accent); line-height: 1.2; }
+.logo-sub { font-size: 0.65rem; font-weight: 700; color: var(--text2); letter-spacing: 0.02em; }
+.school-badge {
+  background: var(--accent-light);
+  border: 1.5px solid rgba(79,70,229,0.2);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 0.72rem; font-weight: 800; color: var(--accent);
+  white-space: nowrap;
+}
+@media (max-width: 520px) { .school-badge { display: none; } }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.total-score {
+  background: var(--green-bg);
+  border: 1.5px solid var(--green-border);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--green);
+}
+.reset-btn {
+  background: transparent;
+  border: 1.5px solid var(--border2);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.15s;
+}
+.reset-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+
+/* ── LAYOUT ── */
+.app-body { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 60px); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--surface);
+  border-right: 2px solid var(--border);
+  padding: 20px 12px;
+  display: flex; flex-direction: column; gap: 3px;
+  overflow-y: auto;
+}
+.sidebar-label {
+  font-size: 0.65rem; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); padding: 0 10px; margin: 12px 0 6px;
+}
+.sidebar-label:first-child { margin-top: 0; }
+.cat-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 10px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.88rem; font-weight: 700;
+  color: var(--text2);
+  cursor: pointer; text-align: left; width: 100%;
+  transition: all 0.15s;
+  position: relative;
+}
+.cat-btn:hover { background: var(--surface2); color: var(--text); }
+.cat-btn.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: rgba(79,70,229,0.2);
+}
+.cat-btn.completed { color: var(--green); }
+.cat-btn.completed.active { background: var(--green-bg); border-color: var(--green-border); }
+.cat-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 900;
+  flex-shrink: 0;
+}
+.cat-info { flex: 1; min-width: 0; }
+.cat-name { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cat-prog-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+.cat-prog-bar {
+  flex: 1; height: 4px; background: var(--border);
+  border-radius: 4px; overflow: hidden;
+}
+.cat-prog-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease; }
+.cat-prog-text { font-size: 0.65rem; font-weight: 800; color: var(--muted); white-space: nowrap; }
+.cat-check { font-size: 0.9rem; flex-shrink: 0; }
+
+/* ── MAIN CONTENT ── */
+.main { padding: 24px; display: flex; flex-direction: column; gap: 20px; max-width: 860px; }
+
+/* ── PROGRESS BAR ── */
+.progress-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
+}
+.prog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.prog-cat-name { font-weight: 800; font-size: 1rem; color: var(--text); }
+.prog-fraction { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent); font-weight: 700; }
+.prog-track { background: var(--border); border-radius: 99px; height: 10px; overflow: hidden; }
+.prog-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent), #818cf8);
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.prog-steps { display: flex; gap: 4px; margin-top: 10px; }
+.prog-step {
+  flex: 1; height: 6px; border-radius: 3px;
+  background: var(--border);
+  transition: background 0.3s;
+}
+.prog-step.done { background: var(--accent); }
+.prog-step.current { background: #818cf8; }
+
+/* ── QUESTION CARD ── */
+.q-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.q-header {
+  padding: 16px 20px;
+  background: var(--surface2);
+  border-bottom: 1.5px solid var(--border);
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.q-badge {
+  background: var(--accent); color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; font-weight: 700;
+  padding: 3px 9px; border-radius: 6px;
+  flex-shrink: 0; margin-top: 2px;
+}
+.q-scenario {
+  background: var(--yellow-bg);
+  border-left: 3px solid var(--yellow);
+  padding: 3px 10px 3px 10px;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.75rem; font-weight: 700;
+  color: var(--yellow);
+  margin-bottom: 5px;
+  display: inline-block;
+}
+.q-text { font-size: 0.97rem; font-weight: 700; line-height: 1.5; color: var(--text); }
+.q-subtext { font-size: 0.82rem; color: var(--text2); margin-top: 4px; font-weight: 600; }
+
+/* ── SPREADSHEET AREA ── */
+.sheet-container {
+  border-bottom: 1.5px solid var(--border);
+  user-select: none;
+}
+.sheet-toolbar {
+  display: flex; align-items: stretch;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  height: 30px;
+}
+.sheet-namebox {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; font-weight: 700;
+  color: var(--text);
+  padding: 0 10px;
+  border-right: 1px solid var(--border);
+  min-width: 68px; display: flex; align-items: center;
+  background: white;
+}
+.sheet-fx { 
+  display: flex; align-items: center;
+  padding: 0 10px;
+  border-right: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; color: var(--accent); font-weight: 700;
+}
+.sheet-preview {
+  flex: 1; display: flex; align-items: center;
+  padding: 0 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; color: var(--text2);
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.sheet-result-badge {
+  display: flex; align-items: center;
+  padding: 0 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; font-weight: 700;
+  color: var(--green);
+  border-left: 1px solid var(--border);
+  background: var(--green-bg);
+  white-space: nowrap;
+}
+.sheet-scroll { overflow: auto; max-height: 240px; position: relative; }
+.spreadsheet {
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  width: 100%;
+}
+.spreadsheet th {
+  background: var(--header-bg);
+  color: var(--text2);
+  border: 1px solid var(--border);
+  padding: 5px 0; text-align: center;
+  font-weight: 800; font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  position: sticky; top: 0; z-index: 2;
+  cursor: default; min-width: 90px;
+  transition: background 0.1s;
+}
+.spreadsheet th.col-hl { background: #c7d7fd; color: var(--blue); }
+.spreadsheet th.corner { min-width: 36px; width: 36px; }
+.spreadsheet td {
+  background: var(--cell-bg);
+  border: 1px solid var(--border);
+  padding: 6px 10px; text-align: center;
+  color: var(--text); height: 28px;
+  cursor: cell; white-space: nowrap;
+  transition: background 0.05s;
+  min-width: 90px;
+}
+.spreadsheet td.rh {
+  background: var(--header-bg);
+  color: var(--text2);
+  font-weight: 800; font-size: 0.72rem;
+  cursor: default; width: 36px; min-width: 36px;
+  padding: 6px 4px;
+  position: sticky; left: 0; z-index: 1;
+  transition: background 0.1s;
+}
+.spreadsheet td.rh.row-hl { background: #c7d7fd; color: var(--blue); }
+.spreadsheet td.hl { background: var(--cell-highlight); color: var(--green); font-weight: 700; }
+.spreadsheet td.selected { background: var(--cell-selected); box-shadow: inset 0 0 0 2px var(--blue); }
+.spreadsheet td.in-range { background: var(--cell-range); }
+.spreadsheet td[tabindex] { outline: none; }
+
+.sel-box {
+  position: absolute; pointer-events: none;
+  border: 2px solid var(--blue);
+  z-index: 5;
+}
+/* Fill handle — the small square at bottom-right of selection */
+.fill-handle {
+  position: absolute;
+  width: 7px; height: 7px;
+  background: var(--blue);
+  border: 1.5px solid white;
+  border-radius: 1px;
+  cursor: crosshair;
+  z-index: 10;
+  pointer-events: all;
+  transform: translate(-50%, -50%);
+}
+/* Autofill preview overlay */
+.autofill-box {
+  position: absolute; pointer-events: none;
+  border: 2px dashed var(--blue);
+  background: rgba(37,99,235,0.05);
+  z-index: 4;
+}
+/* Cells being autofilled — flash green briefly */
+.spreadsheet td.autofilled {
+  background: #bbf7d0 !important;
+  transition: background 0.4s;
+}
+
+/* ── FORMULA INPUT SECTION ── */
+.formula-section { padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+.formula-label-row {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.formula-label {
+  font-size: 0.72rem; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text2);
+}
+.attempt-indicator { font-size: 0.75rem; font-weight: 700; color: var(--muted); }
+
+.formula-wrap {
+  display: flex; align-items: center;
+  border: 2px solid var(--border2);
+  border-radius: 10px; overflow: hidden;
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.formula-wrap:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+.formula-wrap.correct { border-color: var(--green) !important; box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important; }
+.formula-wrap.wrong { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.1) !important; animation: shake 0.35s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+.formula-eq {
+  background: var(--header-bg);
+  border-right: 2px solid var(--border);
+  padding: 11px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem; font-weight: 700;
+  color: var(--accent);
+}
+.formula-input {
+  flex: 1; border: none; outline: none; padding: 11px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem; color: var(--text);
+  background: transparent; caret-color: var(--blue);
+}
+.formula-input::placeholder { color: var(--muted); font-size: 0.82rem; }
+
+/* ── FEEDBACK ── */
+.feedback {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 14px; border-radius: 10px;
+  font-size: 0.85rem; font-weight: 700;
+  opacity: 0; transition: opacity 0.2s;
+  line-height: 1.5;
+}
+.feedback.show { opacity: 1; }
+.feedback.correct { background: var(--green-bg); border: 1.5px solid var(--green-border); color: var(--green); }
+.feedback.wrong { background: var(--red-bg); border: 1.5px solid var(--red-border); color: var(--red); }
+.feedback.hint { background: var(--yellow-bg); border: 1.5px solid #fcd34d; color: var(--yellow); }
+.feedback-icon { font-size: 1.1rem; flex-shrink: 0; }
+.feedback-text { flex: 1; }
+.feedback-text a { color: var(--blue); }
+
+/* ── FORMULA RESULT PREVIEW ── */
+.result-preview {
+  display: none;
+  align-items: center; gap: 8px;
+  background: var(--green-bg);
+  border: 1.5px solid var(--green-border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem; color: var(--green); font-weight: 700;
+}
+.result-preview.show { display: flex; }
+
+/* ── BUTTONS ── */
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  padding: 10px 20px; border-radius: 10px; border: none;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.88rem; font-weight: 800;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: #4338ca; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-primary:active { transform: translateY(0); }
+.btn-next { background: var(--green); color: white; }
+.btn-next:hover:not(:disabled) { background: #15803d; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-next:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-ghost {
+  background: transparent; color: var(--text2);
+  border: 1.5px solid var(--border2);
+  text-decoration: none;
+}
+.btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+
+/* ── COMPLETION CARD ── */
+.completion-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 40px 32px;
+  text-align: center; display: none;
+  flex-direction: column; align-items: center; gap: 16px;
+  box-shadow: var(--shadow-md);
+}
+.completion-card.show { display: flex; }
+.completion-emoji { font-size: 3.5rem; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes popIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+.completion-title { font-size: 1.6rem; font-weight: 900; color: var(--text); }
+.completion-title span { color: var(--accent); }
+.completion-sub { color: var(--text2); font-size: 0.92rem; font-weight: 600; max-width: 420px; line-height: 1.6; }
+.cat-summary {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  margin: 4px 0;
+}
+.cat-pill {
+  background: var(--accent-light); border: 1.5px solid rgba(79,70,229,0.2);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 0.8rem; font-weight: 800; color: var(--accent);
+}
+
+/* ── MODALS ── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(15,23,42,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 200; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.overlay.show { display: flex; }
+.modal {
+  background: var(--surface); border-radius: 18px;
+  padding: 36px 32px; max-width: 420px; width: 100%;
+  text-align: center; display: flex; flex-direction: column; gap: 16px;
+  box-shadow: var(--shadow-lg);
+  animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.modal-emoji { font-size: 3rem; }
+.modal-title { font-size: 1.4rem; font-weight: 900; color: var(--text); }
+.modal-sub { font-size: 0.88rem; color: var(--text2); font-weight: 600; line-height: 1.6; }
+.modal-input {
+  border: 2px solid var(--border2); border-radius: 10px;
+  padding: 12px 16px; font-family: 'Nunito', sans-serif;
+  font-size: 1rem; font-weight: 700; color: var(--text);
+  text-align: center; outline: none; background: var(--surface2);
+  transition: border-color 0.2s;
+}
+.modal-input:focus { border-color: var(--blue); }
+.modal-input::placeholder { color: var(--muted); font-weight: 600; }
+.modal-input.error { border-color: var(--red); }
+
+/* ── CERTIFICATE ── */
+.cert-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(15,23,42,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 300; align-items: center; justify-content: center; padding: 20px;
+}
+.cert-overlay.show { display: flex; }
+.cert-wrapper { position: relative; max-width: 800px; width: 100%; }
+.cert-close {
+  position: absolute; top: -12px; right: -12px;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: white; border: 1.5px solid var(--border2);
+  color: var(--text2); font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 10;
+  transition: all 0.15s;
+}
+.cert-close:hover { background: var(--red-bg); color: var(--red); }
+
+.certificate {
+  background: white; border-radius: 16px; overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  font-family: 'Nunito', sans-serif;
+}
+.cert-stripe {
+  height: 8px;
+  background: linear-gradient(90deg,#4f46e5,#7c3aed,#2563eb,#0891b2,#16a34a,#d97706,#dc2626,#4f46e5);
+  background-size: 400% 100%;
+  animation: stripeAnim 4s linear infinite;
+}
+@keyframes stripeAnim { 0%{background-position:0%} 100%{background-position:400%} }
+.cert-body-inner { padding: 44px 52px 36px; text-align: center; position: relative; }
+.cert-watermark {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12rem; font-weight: 900;
+  color: rgba(79,70,229,0.04);
+  font-family: 'JetBrains Mono', monospace;
+  pointer-events: none; user-select: none;
+}
+.cert-issued-by { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; }
+.cert-heading { font-size: 2rem; font-weight: 900; color: #1e293b; }
+.cert-heading span { color: var(--accent); }
+.cert-div { width: 60px; height: 3px; background: linear-gradient(90deg,var(--accent),var(--blue)); border-radius: 99px; margin: 16px auto; }
+.cert-presented { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; }
+.cert-name { font-size: 2.2rem; font-weight: 900; color: #0f172a; letter-spacing: -0.02em; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; display: inline-block; min-width: 280px; margin-bottom: 20px; }
+.cert-score-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #eff6ff; border: 1.5px solid #bfdbfe;
+  border-radius: 99px; padding: 7px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 0.85rem; color: var(--blue);
+  margin-bottom: 18px;
+}
+.cert-desc { font-size: 0.88rem; color: #475569; line-height: 1.7; max-width: 480px; margin: 0 auto 22px; }
+.cert-badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 28px; }
+.cert-badge { background: #f8faff; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 5px 12px; font-size: 0.72rem; font-weight: 800; color: #475569; }
+.cert-footer { display: flex; align-items: flex-end; justify-content: space-between; border-top: 1px solid #e2e8f0; padding-top: 18px; }
+.cert-sig-line { width: 120px; height: 2px; background: #cbd5e1; margin-bottom: 5px; }
+.cert-sig-name { font-size: 0.72rem; font-weight: 800; color: #64748b; }
+.cert-sig-role { font-size: 0.62rem; color: #94a3b8; }
+.cert-seal {
+  width: 70px; height: 70px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--blue));
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: white; text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.52rem; font-weight: 700; line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(79,70,229,0.35);
+}
+.cert-date-val { font-size: 0.72rem; font-weight: 800; color: #64748b; }
+.cert-date-label { font-size: 0.62rem; color: #94a3b8; }
+.cert-actions { display: flex; gap: 10px; justify-content: center; margin-top: 18px; }
+
+/* ── CONFETTI ── */
+.confetti-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 299; overflow: hidden; }
+.cp { position: absolute; top: -12px; animation: cpFall linear forwards; }
+@keyframes cpFall { 0%{opacity:1;transform:translateY(0) rotate(0)} 100%{opacity:0;transform:translateY(105vh) rotate(800deg)} }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  .app-body { grid-template-columns: 1fr; }
+  .sidebar {
+    flex-direction: row; overflow-x: auto; padding: 10px;
+    border-right: none; border-bottom: 2px solid var(--border);
+  }
+  .sidebar-label { display: none; }
+  .cat-btn { min-width: max-content; flex-shrink: 0; padding: 8px 10px; }
+  .cat-info .cat-prog-row { display: none; }
+  .main { padding: 14px; }
+  .cert-body-inner { padding: 28px 20px 24px; }
+  .cert-name { font-size: 1.5rem; min-width: 0; }
+}
+
+/* ── WHY BANNER (Fix 4) ── */
+.why-banner {
+  background: linear-gradient(135deg, #eef2ff, #eff6ff);
+  border: 1.5px solid #c7d2fe;
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: none;
+  gap: 12px;
+  align-items: flex-start;
+  box-shadow: var(--shadow);
+  animation: slideIn 0.3s ease;
+}
+.why-banner.show { display: flex; }
+@keyframes slideIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+.why-icon { font-size: 1.8rem; flex-shrink: 0; }
+.why-content { flex: 1; }
+.why-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+.why-title { font-size: 0.95rem; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.why-text { font-size: 0.83rem; color: var(--text2); font-weight: 600; line-height: 1.6; }
+.why-dismiss { font-size: 0.72rem; font-weight: 700; color: var(--accent); cursor: pointer; text-decoration: underline; margin-top: 8px; display: inline-block; }
+
+/* ── EXAMPLE MODAL (Fix 1) ── */
+.example-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(15,23,42,0.65);
+  backdrop-filter: blur(5px);
+  z-index: 250; align-items: center; justify-content: center; padding: 20px;
+}
+.example-overlay.show { display: flex; }
+.example-modal {
+  background: white; border-radius: 18px;
+  max-width: 600px; width: 100%;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.example-header {
+  background: linear-gradient(135deg, var(--accent), #818cf8);
+  padding: 20px 24px 16px;
+  color: white;
+}
+.example-header-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px; }
+.example-header-title { font-size: 1.3rem; font-weight: 900; }
+.example-header-why { font-size: 0.83rem; opacity: 0.9; margin-top: 8px; line-height: 1.5; font-weight: 600; }
+.example-body { padding: 20px 24px; }
+.example-step {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.example-step:last-child { border-bottom: none; }
+.example-step-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 900; flex-shrink: 0;
+}
+.example-step-text { font-size: 0.88rem; font-weight: 600; color: var(--text2); line-height: 1.5; flex: 1; }
+.example-step-text strong { color: var(--text); }
+.example-mini-sheet {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden; margin: 10px 0;
+}
+.example-mini-table { border-collapse: collapse; width: 100%; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+.example-mini-table th { background: var(--header-bg); color: var(--text2); border: 1px solid var(--border); padding: 4px 10px; text-align: center; font-weight: 800; font-size: 0.68rem; }
+.example-mini-table td { background: white; border: 1px solid var(--border); padding: 5px 10px; text-align: center; color: var(--text); }
+.example-mini-table td.rh { background: var(--header-bg); color: var(--text2); font-weight: 800; width: 28px; }
+.example-mini-table td.hl { background: var(--cell-highlight); color: var(--green); font-weight: 700; }
+.example-formula-display {
+  background: #1e1b4b; border-radius: 8px;
+  padding: 10px 14px; margin: 10px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem; color: #a5b4fc;
+}
+.example-formula-display .ef-eq { color: #f472b6; }
+.example-formula-display .ef-fn { color: #34d399; }
+.example-formula-display .ef-range { color: #fbbf24; }
+.example-result-display {
+  background: var(--green-bg); border: 1.5px solid var(--green-border);
+  border-radius: 8px; padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem; font-weight: 700; color: var(--green);
+  display: flex; align-items: center; gap: 8px;
+}
+.example-footer {
+  padding: 16px 24px;
+  border-top: 1.5px solid var(--border);
+  background: var(--surface2);
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.example-footer-tip { font-size: 0.8rem; color: var(--text2); font-weight: 600; }
+
+/* ── CELL PULSE ANIMATION (Fix 3) ── */
+@keyframes cellPulse {
+  0%  { box-shadow: inset 0 0 0 0 rgba(22,163,74,0.6); background: var(--cell-highlight); }
+  40% { box-shadow: inset 0 0 0 3px rgba(22,163,74,0.8); background: #bbf7d0; }
+  100%{ box-shadow: inset 0 0 0 2px rgba(22,163,74,0.4); background: var(--cell-highlight); }
+}
+.spreadsheet td.pulse-correct {
+  animation: cellPulse 0.6s ease forwards;
+}
+
+/* ── SMART ERROR FEEDBACK (Fix 2) ── */
+.feedback-detail {
+  margin-top: 6px; font-size: 0.8rem; font-weight: 600;
+  padding: 7px 10px; border-radius: 7px;
+  background: rgba(0,0,0,0.06);
+  line-height: 1.5;
+}
+.feedback-detail code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; background: rgba(0,0,0,0.1);
+  padding: 1px 5px; border-radius: 3px;
+}
+
+/* ── LEADERBOARD BUTTON IN HEADER ── */
+.lb-btn {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  border: none; border-radius: 8px;
+  padding: 6px 14px; font-family: 'Nunito', sans-serif;
+  font-size: 0.8rem; font-weight: 800; color: white;
+  cursor: pointer; display: flex; align-items: center; gap: 5px;
+  box-shadow: 0 2px 8px rgba(245,158,11,0.35);
+  transition: all 0.15s; white-space: nowrap;
+}
+.lb-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,158,11,0.45); }
+.lb-btn .lb-count {
+  background: rgba(255,255,255,0.25);
+  border-radius: 10px; padding: 1px 6px;
+  font-size: 0.7rem;
+}
+
+/* ── STREAK COUNTER ── */
+.streak-wrap {
+  position: fixed; top: 80px; left: 50%;
+  transform: translateX(-50%) translateY(-120px);
+  z-index: 410; transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none;
+}
+.streak-wrap.show { transform: translateX(-50%) translateY(0); }
+.streak-bubble {
+  background: linear-gradient(135deg, #f97316, #ef4444);
+  border-radius: 99px; padding: 10px 24px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 8px 32px rgba(239,68,68,0.45);
+  white-space: nowrap;
+}
+.streak-flame { font-size: 1.6rem; animation: flameDance 0.6s ease infinite alternate; }
+@keyframes flameDance { from{transform:scale(1) rotate(-5deg)} to{transform:scale(1.15) rotate(5deg)} }
+.streak-text { display: flex; flex-direction: column; }
+.streak-count { font-size: 1.1rem; font-weight: 900; color: white; line-height: 1.1; font-family:'JetBrains Mono',monospace; }
+.streak-label { font-size: 0.65rem; font-weight: 800; color: rgba(255,255,255,0.8); letter-spacing: 0.1em; text-transform: uppercase; }
+.streak-mult {
+  background: rgba(255,255,255,0.2); border-radius: 8px;
+  padding: 4px 10px; font-size: 0.8rem; font-weight: 900;
+  color: white; font-family:'JetBrains Mono',monospace;
+}
+/* Milestone burst — full-screen flash */
+.streak-burst {
+  position: fixed; inset: 0; z-index: 409;
+  pointer-events: none; display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.15s;
+}
+.streak-burst.flash { opacity: 1; }
+.streak-burst-inner {
+  font-size: 3.5rem; font-weight: 900; color: white;
+  text-shadow: 0 0 40px rgba(249,115,22,0.9);
+  animation: burstPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes burstPop { from{transform:scale(0.3);opacity:0} to{transform:scale(1);opacity:1} }
+/* Streak indicator badge in header */
+.streak-badge {
+  display: none; align-items: center; gap: 4px;
+  background: linear-gradient(135deg,#f97316,#ef4444);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 0.78rem; font-weight: 900; color: white;
+  box-shadow: 0 2px 8px rgba(239,68,68,0.3);
+  animation: streakPulse 1s ease infinite;
+}
+.streak-badge.show { display: flex; }
+@keyframes streakPulse { 0%,100%{box-shadow:0 2px 8px rgba(239,68,68,0.3)} 50%{box-shadow:0 2px 16px rgba(239,68,68,0.6)} }
+
+/* ── SCORE TOAST — appears after correct answer ── */
+.score-toast {
+  position: fixed; top: 80px; right: 24px;
+  background: white; border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  border: 2px solid var(--green-border);
+  padding: 14px 20px; z-index: 400;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  min-width: 160px;
+}
+.score-toast.show { transform: translateX(0); }
+.score-toast .st-pts { font-size: 1.8rem; font-weight: 900; color: var(--green); line-height: 1; font-family: 'JetBrains Mono', monospace; }
+.score-toast .st-label { font-size: 0.7rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.score-toast .st-bonus { font-size: 0.78rem; font-weight: 700; color: var(--accent); }
+.score-toast .st-total { font-size: 0.78rem; font-weight: 800; color: var(--text2); margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--border); width: 100%; text-align: center; }
+
+/* ── TIMER BAR ── */
+.timer-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 20px 0;
+}
+.timer-bar-wrap {
+  flex: 1; height: 6px; background: var(--border);
+  border-radius: 99px; overflow: hidden;
+}
+.timer-bar-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, #16a34a, #f59e0b, #dc2626);
+  background-size: 200% 100%;
+  transition: width 1s linear, background-position 1s linear;
+}
+.timer-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; font-weight: 700;
+  color: var(--text2); white-space: nowrap; min-width: 44px; text-align: right;
+}
+
+/* ── LEADERBOARD OVERLAY ── */
+.lb-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(15,23,42,0.7);
+  backdrop-filter: blur(6px);
+  z-index: 350; align-items: center; justify-content: center; padding: 20px;
+}
+.lb-overlay.show { display: flex; }
+.lb-panel {
+  background: white; border-radius: 20px;
+  max-width: 580px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  overflow: hidden;
+  animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  max-height: 90vh; display: flex; flex-direction: column;
+}
+.lb-header {
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  padding: 20px 24px 16px;
+  color: white; flex-shrink: 0;
+}
+.lb-header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.lb-header h2 { font-size: 1.3rem; font-weight: 900; margin-bottom: 2px; }
+.lb-header p { font-size: 0.8rem; opacity: 0.75; font-weight: 600; }
+.lb-close-btn {
+  background: rgba(255,255,255,0.15); border: none; border-radius: 8px;
+  color: white; font-size: 1rem; width: 30px; height: 30px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s; flex-shrink: 0;
+}
+.lb-close-btn:hover { background: rgba(255,255,255,0.25); }
+.lb-my-score {
+  background: rgba(255,255,255,0.12); border-radius: 10px;
+  padding: 10px 14px; margin-top: 12px;
+  display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+}
+.lb-my-stat { display: flex; flex-direction: column; align-items: center; }
+.lb-my-stat-val { font-size: 1.2rem; font-weight: 900; font-family: 'JetBrains Mono', monospace; }
+.lb-my-stat-label { font-size: 0.6rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
+.lb-body { overflow-y: auto; flex: 1; padding: 0; }
+.lb-table { width: 100%; border-collapse: collapse; }
+.lb-table thead th {
+  background: #f8faff; padding: 10px 16px;
+  font-size: 0.68rem; font-weight: 900; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text2);
+  border-bottom: 2px solid var(--border);
+  text-align: left; position: sticky; top: 0;
+}
+.lb-table thead th:last-child, .lb-table thead th:nth-child(3), .lb-table thead th:nth-child(4) { text-align: right; }
+.lb-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.lb-table tbody tr:hover { background: var(--surface2); }
+.lb-table tbody tr.lb-me { background: #eff6ff; }
+.lb-table tbody tr.lb-me td { color: var(--blue); font-weight: 800; }
+.lb-table td { padding: 11px 16px; font-size: 0.88rem; font-weight: 700; }
+.lb-table td:last-child, .lb-table td:nth-child(3), .lb-table td:nth-child(4) { text-align: right; }
+.lb-rank {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 8px;
+  font-size: 0.78rem; font-weight: 900;
+  background: var(--surface2); color: var(--text2);
+}
+.lb-rank.r1 { background: #fef3c7; color: #92400e; }
+.lb-rank.r2 { background: #f1f5f9; color: #475569; }
+.lb-rank.r3 { background: #fff7ed; color: #9a3412; }
+.lb-name-cell { display: flex; align-items: center; gap: 8px; }
+.lb-avatar {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 900; color: white; flex-shrink: 0;
+}
+.lb-pts { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; }
+.lb-accuracy { font-size: 0.8rem; }
+.lb-move {
+  font-size: 0.7rem; font-weight: 900;
+  padding: 1px 5px; border-radius: 4px;
+}
+.lb-move.up { color: var(--green); background: var(--green-bg); }
+.lb-move.down { color: var(--red); background: var(--red-bg); }
+.lb-footer {
+  padding: 12px 20px; border-top: 1.5px solid var(--border);
+  background: var(--surface2); display: flex; gap: 10px;
+  justify-content: space-between; align-items: center; flex-shrink: 0;
+}
+.lb-footer-tip { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+.lb-empty {
+  text-align: center; padding: 40px 24px; color: var(--muted);
+  font-size: 0.9rem; font-weight: 700;
+}
+.lb-name-input-row {
+  padding: 12px 20px; border-bottom: 1.5px solid var(--border);
+  background: var(--surface2); display: flex; gap: 8px; align-items: center;
+}
+.lb-name-input {
+  flex: 1; border: 2px solid var(--border2); border-radius: 8px;
+  padding: 8px 12px; font-family: 'Nunito', sans-serif;
+  font-size: 0.88rem; font-weight: 700; color: var(--text); outline: none;
+  transition: border-color 0.2s;
+}
+.lb-name-input:focus { border-color: var(--blue); }
+.btn-sm {
+  padding: 8px 14px; border-radius: 8px; border: none;
+  font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 800;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-sm-primary { background: var(--accent); color: white; }
+.btn-sm-primary:hover { background: #4338ca; }
+.btn-sm-ghost { background: transparent; color: var(--text2); border: 1.5px solid var(--border2); }
+.btn-sm-ghost:hover { background: var(--surface2); }
+
+@media print {
+  body *{ visibility:hidden; }
+  .certificate,.certificate *{ visibility:visible; }
+  .certificate{ position:fixed; inset:0; border-radius:0; box-shadow:none; }
+  .cert-stripe{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .cert-actions,.cert-close{ display:none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">
+    <div class="logo-icon">fx</div>
+    <div>
+      <div class="logo-title">Formula Lab</div>
+      <div class="logo-sub">Mr. Andreopoulos · East York CI</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="school-badge">🏫 East York CI</div>
+    <div class="streak-badge" id="streak-badge">🔥 <span id="streak-hdr">0</span></div>
+    <button class="lb-btn" onclick="openLeaderboard()">
+      🏆 Leaderboard <span class="lb-count" id="lb-count">0</span>
+    </button>
+    <div class="total-score" id="total-score">0 / 70 Complete</div>
+    <button class="reset-btn" onclick="confirmReset()">↺ Reset</button>
+  </div>
+</header>
+
+<div class="app-body">
+  <nav class="sidebar" id="sidebar"></nav>
+
+  <main class="main">
+    <!-- Progress -->
+    <div class="progress-card">
+      <div class="prog-header">
+        <span class="prog-cat-name" id="prog-cat-name">Loading…</span>
+        <span class="prog-fraction" id="prog-fraction">0 / 10</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="prog-steps" id="prog-steps"></div>
+    </div>
+
+    <!-- Why banner (Fix 4) — shown at start of each new category -->
+    <div class="why-banner" id="why-banner" style="display:none">
+      <div class="why-icon" id="why-icon">💡</div>
+      <div class="why-content">
+        <div class="why-label">Why learn this?</div>
+        <div class="why-title" id="why-title"></div>
+        <div class="why-text" id="why-text"></div>
+        <span class="why-dismiss" onclick="dismissWhy()">Got it — start the questions →</span>
+      </div>
+    </div>
+
+    <!-- Question card -->
+    <div class="q-card" id="q-card">
+      <div class="q-header">
+        <span class="q-badge" id="q-badge">Q1</span>
+        <div>
+          <div class="q-scenario" id="q-scenario"></div>
+          <div class="q-text" id="q-text"></div>
+          <div class="q-subtext" id="q-subtext"></div>
+        </div>
+      </div>
+
+      <!-- Timer bar -->
+      <div class="timer-row" id="timer-row">
+        <div class="timer-bar-wrap">
+          <div class="timer-bar-fill" id="timer-bar" style="width:100%"></div>
+        </div>
+        <div class="timer-label" id="timer-label">0:30</div>
+      </div>
+
+      <!-- Spreadsheet -->
+      <div class="sheet-container">
+        <div class="sheet-toolbar">
+          <div class="sheet-namebox" id="sheet-namebox">—</div>
+          <div class="sheet-fx">fx</div>
+          <div class="sheet-preview" id="sheet-preview">Select cells to build your formula</div>
+          <div class="sheet-result-badge" id="sheet-result" style="display:none"></div>
+        </div>
+        <div class="sheet-scroll" id="sheet-scroll">
+          <table class="spreadsheet" id="spreadsheet"></table>
+          <div class="sel-box" id="sel-box" style="display:none"></div>
+          <div class="fill-handle" id="fill-handle" style="display:none"></div>
+          <div class="autofill-box" id="autofill-box" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- Formula input -->
+      <div class="formula-section">
+        <div class="formula-label-row">
+          <span class="formula-label">Your Formula</span>
+          <span class="attempt-indicator" id="attempt-ind"></span>
+        </div>
+        <div class="formula-wrap" id="formula-wrap">
+          <div class="formula-eq">=</div>
+          <input class="formula-input" id="formula-input"
+            type="text" autocomplete="off" spellcheck="false"
+            placeholder="Type or click cells to build your formula…">
+        </div>
+        <div class="feedback" id="feedback">
+          <span class="feedback-icon" id="fb-icon"></span>
+          <span class="feedback-text" id="fb-text"></span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="checkAnswer()">▶ Check Answer</button>
+          <button class="btn btn-next" id="next-btn" onclick="nextQuestion()" disabled>Next →</button>
+          <a class="btn btn-ghost" href="https://excelexercises.com/excel-functions.html" target="_blank" rel="noopener">💡 Help ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Level complete card -->
+    <div class="completion-card" id="completion-card">
+      <div class="completion-emoji">🎉</div>
+      <div class="completion-title">Level <span>Complete!</span></div>
+      <div class="completion-sub" id="comp-sub"></div>
+      <button class="btn btn-primary" onclick="nextCategory()" style="font-size:1rem;padding:12px 28px">
+        Continue to Next Level →
+      </button>
+    </div>
+  </main>
+</div>
+
+<!-- Name modal -->
+<div class="overlay" id="name-overlay">
+  <div class="modal">
+    <div class="modal-emoji">🏆</div>
+    <div class="modal-title">All 70 Done!</div>
+    <div class="modal-sub">You've completed every formula challenge. Enter your name to generate your certificate of achievement.</div>
+    <input class="modal-input" id="name-input" type="text" placeholder="Your full name" maxlength="60" autocomplete="off">
+    <button class="btn btn-primary" style="justify-content:center;font-size:1rem;padding:12px;" onclick="generateCert()">
+      🎓 Generate Certificate
+    </button>
+  </div>
+</div>
+
+<!-- Example Modal (Fix 1) — interactive walkthrough before first question -->
+<div class="example-overlay" id="example-overlay">
+  <div class="example-modal">
+    <div class="example-header">
+      <div class="example-header-label">📖 Mr. Andreopoulos's Formula Lab — Worked Example</div>
+      <div class="example-header-title" id="ex-title"></div>
+      <div class="example-header-why" id="ex-why"></div>
+    </div>
+    <div class="example-body">
+      <div class="example-step">
+        <div class="example-step-num">1</div>
+        <div class="example-step-text">
+          <strong>Look at the data in the spreadsheet.</strong> The highlighted cells (in green) are the ones you'll work with.
+          <div class="example-mini-sheet"><table class="example-mini-table" id="ex-table"></table></div>
+        </div>
+      </div>
+      <div class="example-step">
+        <div class="example-step-num">2</div>
+        <div class="example-step-text">
+          <strong>Build the formula.</strong> Always start with <code style="background:#1e1b4b;color:#f472b6;padding:2px 6px;border-radius:3px">=</code> then the function and range:
+          <div class="example-formula-display" id="ex-formula-display"></div>
+          <div id="ex-formula-desc" style="font-size:0.8rem;color:var(--text2);margin-top:4px;font-weight:600"></div>
+        </div>
+      </div>
+      <div class="example-step">
+        <div class="example-step-num">3</div>
+        <div class="example-step-text">
+          <strong>Press Enter — Google Sheets calculates the result:</strong>
+          <div class="example-result-display" id="ex-result-display"></div>
+        </div>
+      </div>
+    </div>
+    <div class="example-footer">
+      <div class="example-footer-tip">💡 Tip: you can click cells in the spreadsheet to build your formula automatically!</div>
+      <button class="btn btn-primary" onclick="closeExample()" style="white-space:nowrap">I'm ready — let's go! →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confetti -->
+<div class="confetti-wrap" id="confetti-wrap"></div>
+
+<!-- Certificate overlay -->
+<div class="cert-overlay" id="cert-overlay">
+  <div class="cert-wrapper">
+    <button class="cert-close" onclick="closeCert()">✕</button>
+    <div class="certificate" id="certificate">
+      <div class="cert-stripe"></div>
+      <div class="cert-body-inner">
+        <div class="cert-watermark">fx</div>
+        <div class="cert-issued-by">Certificate of Achievement</div>
+        <div class="cert-heading">Formula <span>Lab</span></div>
+        <div class="cert-div"></div>
+        <div class="cert-presented">This certificate is proudly awarded to</div>
+        <div class="cert-name" id="cert-name">Student Name</div>
+        <div class="cert-score-pill" id="cert-score">✓ 70 / 70</div>
+        <div class="cert-desc">
+          For successfully completing all <strong>70 formula challenges</strong> across
+          <strong>7 skill levels</strong> in Mr. Andreopoulos's Google Sheets Formula Lab
+          at East York Collegiate Institute, demonstrating mastery of spreadsheet formulas
+          used in real-world situations.
+        </div>
+        <div class="cert-badges">
+          <div class="cert-badge">± Basic Math</div>
+          <div class="cert-badge">Σ SUM</div>
+          <div class="cert-badge">x̄ AVERAGE</div>
+          <div class="cert-badge">↑ MAX</div>
+          <div class="cert-badge">↓ MIN</div>
+          <div class="cert-badge"># COUNT</div>
+          <div class="cert-badge">Aa COUNTA</div>
+        </div>
+        <div class="cert-footer">
+          <div>
+            <div class="cert-sig-line"></div>
+            <div class="cert-sig-name">Mr. Andreopoulos</div>
+            <div class="cert-sig-role">East York Collegiate Institute</div>
+          </div>
+          <div class="cert-seal"><div style="font-size:1.5rem">★</div><div>100%</div><div>COMPLETE</div></div>
+          <div style="text-align:right">
+            <div class="cert-date-val" id="cert-date"></div>
+            <div class="cert-date-label">Date of Completion</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cert-actions">
+      <button class="btn btn-primary" id="dl-btn" onclick="downloadCert()">⬇ Download PNG</button>
+      <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
+      <button class="btn btn-ghost" onclick="closeCert()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Score toast -->
+<!-- Streak bubble (top-centre) -->
+<div class="streak-wrap" id="streak-wrap">
+  <div class="streak-bubble">
+    <div class="streak-flame">🔥</div>
+    <div class="streak-text">
+      <div class="streak-count"><span id="streak-num">3</span> in a row!</div>
+      <div class="streak-label" id="streak-label">Streak</div>
+    </div>
+    <div class="streak-mult" id="streak-mult">×1.5</div>
+  </div>
+</div>
+<!-- Milestone burst overlay -->
+<div class="streak-burst" id="streak-burst">
+  <div class="streak-burst-inner" id="streak-burst-inner"></div>
+</div>
+
+<div class="score-toast" id="score-toast">
+  <div class="st-label">Points Earned</div>
+  <div class="st-pts" id="st-pts">+0</div>
+  <div class="st-bonus" id="st-bonus"></div>
+  <div class="st-total" id="st-total">Total: 0 pts</div>
+</div>
+
+<!-- Leaderboard overlay -->
+<div class="lb-overlay" id="lb-overlay">
+  <div class="lb-panel">
+    <div class="lb-header">
+      <div class="lb-header-top">
+        <div>
+          <h2>🏆 Class Leaderboard</h2>
+          <p>Mr. Andreopoulos · East York CI · Formula Lab</p>
+        </div>
+        <button class="lb-close-btn" onclick="closeLeaderboard()">✕</button>
+      </div>
+      <div class="lb-my-score" id="lb-my-score">
+        <div class="lb-my-stat">
+          <div class="lb-my-stat-val" id="lb-my-pts">0</div>
+          <div class="lb-my-stat-label">My Points</div>
+        </div>
+        <div class="lb-my-stat">
+          <div class="lb-my-stat-val" id="lb-my-q">0</div>
+          <div class="lb-my-stat-label">Answered</div>
+        </div>
+        <div class="lb-my-stat">
+          <div class="lb-my-stat-val" id="lb-my-acc">—</div>
+          <div class="lb-my-stat-label">Accuracy</div>
+        </div>
+        <div class="lb-my-stat">
+          <div class="lb-my-stat-val" id="lb-my-rank">#—</div>
+          <div class="lb-my-stat-label">My Rank</div>
+        </div>
+      </div>
+    </div>
+    <div class="lb-name-input-row" id="lb-name-row">
+      <input class="lb-name-input" id="lb-name-input" type="text" placeholder="Enter your name to join the leaderboard…" maxlength="30" autocomplete="off">
+      <button class="btn-sm btn-sm-primary" onclick="joinLeaderboard()">Join</button>
+    </div>
+    <div class="lb-body">
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th style="width:44px">#</th>
+            <th>Student</th>
+            <th>Points</th>
+            <th>Qs</th>
+            <th>Accuracy</th>
+            <th>🔥 Best</th>
+          </tr>
+        </thead>
+        <tbody id="lb-tbody"></tbody>
+      </table>
+      <div class="lb-empty" id="lb-empty" style="display:none">No students on the board yet.<br>Be the first to join! 🚀</div>
+    </div>
+    <div class="lb-footer">
+      <div class="lb-footer-tip">📱 Scores on this device only — each student sees their own score</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sm btn-sm-ghost" onclick="refreshLeaderboard()">↻ Refresh</button>
+        <button class="btn-sm btn-sm-ghost" onclick="closeLeaderboard()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// QUESTION DATA — 7 categories × 10 questions, escalating difficulty
+// Real-world scenarios, varied contexts, true progressive complexity
+// =====================================================================
+const CATS = [
+  {
+    id:'math', name:'Basic Math', icon:'±', color:'#7c3aed',
+    desc:'Add, subtract, multiply, divide using cell references',
+    questions:[
+      // Level 1–3: pure reference operations
+      {
+        scenario:'🛒 School Store',
+        text:'A pencil costs the amount in A1 and a ruler costs B1. Write a formula to find the total cost.',
+        subtext:'Add A1 and B1 together.',
+        table:{headers:['A','B','C'],rows:[['1.50','2.25',''],['','',''],['','',''],['','',''],['','','']]},
+        hl:[[0,0],[0,1]], answers:['=a1+b1','=b1+a1'],
+        result: ()=> 1.50+2.25, resultLabel:'$3.75'
+      },
+      {
+        scenario:'🎒 Inventory Check',
+        text:'The supply room had A2 notebooks. B2 were used. How many are left?',
+        subtext:'Subtract B2 from A2.',
+        table:{headers:['A','B'],rows:[['',''],['48','13'],['',''],['',''],['','']]},
+        hl:[[1,0],[1,1]], answers:['=a2-b2'],
+        result:()=>48-13, resultLabel:'35'
+      },
+      {
+        scenario:'📐 Classroom Setup',
+        text:'Each row has A3 desks and there are B3 rows. Find the total number of desks.',
+        subtext:'Multiply A3 by B3.',
+        table:{headers:['A','B'],rows:[['',''],['',''],['6','5'],['',''],['','']]},
+        hl:[[2,0],[2,1]], answers:['=a3*b3','=b3*a3'],
+        result:()=>6*5, resultLabel:'30'
+      },
+      {
+        scenario:'🍕 Pizza Party',
+        text:'A4 slices of pizza are shared equally among B4 students. How many slices each?',
+        subtext:'Divide A4 by B4.',
+        table:{headers:['A','B'],rows:[['',''],['',''],['',''],['32','8'],['','']]},
+        hl:[[3,0],[3,1]], answers:['=a4/b4'],
+        result:()=>32/8, resultLabel:'4'
+      },
+      {
+        scenario:'💰 Fundraiser',
+        text:'Monday raised A1 dollars, Tuesday raised B1, and Wednesday raised A2. Add all three without using SUM.',
+        subtext:'Chain three cell references with + signs.',
+        table:{headers:['A','B'],rows:[['120','85'],['95',''],['',''],['',''],['','']]},
+        hl:[[0,0],[0,1],[1,0]], answers:['=a1+b1+a2','=a1+a2+b1','=b1+a1+a2','=b1+a2+a1','=a2+a1+b1','=a2+b1+a1'],
+        result:()=>120+85+95, resultLabel:'$300'
+      },
+      {
+        scenario:'🎯 Scoring',
+        text:'A player scored A1 points in round 1 and A2 in round 2. Their penalty in B1 is subtracted from the total. Find their final score.',
+        subtext:'Add A1 and A2, then subtract B1.',
+        table:{headers:['A','B'],rows:[['75','10'],['60',''],['',''],['',''],['','']]},
+        hl:[[0,0],[1,0],[0,1]], answers:['=a1+a2-b1','=(a1+a2)-b1','=a2+a1-b1'],
+        result:()=>75+60-10, resultLabel:'125'
+      },
+      {
+        scenario:'📦 Packaging',
+        text:'Each box holds B2 items, and you have A2 boxes. How many items total? Then add the A3 leftover items.',
+        subtext:'Multiply first, then add.',
+        table:{headers:['A','B'],rows:[['',''],['12','24'],['7',''],['',''],['','']]},
+        hl:[[1,0],[1,1],[2,0]], answers:['=a2*b2+a3','=(a2*b2)+a3','=a3+a2*b2','=a3+(a2*b2)'],
+        result:()=>12*24+7, resultLabel:'295'
+      },
+      {
+        scenario:'⚡ Electricity Bill',
+        text:'You used A1 kWh in January and B1 kWh in February. Each kWh costs A2 cents. What is the total cost in cents?',
+        subtext:'Add both months first, then multiply by the rate.',
+        table:{headers:['A','B'],rows:[['320','280'],['15',''],['',''],['',''],['','']]},
+        hl:[[0,0],[0,1],[1,0]], answers:['=(a1+b1)*a2','=a2*(a1+b1)','=(b1+a1)*a2','=a2*(b1+a1)'],
+        result:()=>(320+280)*15, resultLabel:'9000'
+      },
+      {
+        scenario:'🏃 Track & Field',
+        text:'A runner\'s time was A4 seconds. The course record is B4. How many seconds slower is the runner?',
+        subtext:'Subtract the record from the runner\'s time.',
+        table:{headers:['A','B'],rows:[['',''],['',''],['',''],['58.3','54.1'],['','']]},
+        hl:[[3,0],[3,1]], answers:['=a4-b4'],
+        result:()=>58.3-54.1, resultLabel:'4.2 sec'
+      },
+      {
+        scenario:'💡 Challenge',
+        text:'Calculate: double A1, add B1, then subtract half of A2. Use real cell references.',
+        subtext:'Think about order of operations.',
+        table:{headers:['A','B'],rows:[['10','7'],['8',''],['',''],['',''],['','']]},
+        hl:[[0,0],[0,1],[1,0]], answers:['=a1*2+b1-a2/2','=2*a1+b1-a2/2','=(a1*2)+b1-(a2/2)','=2*a1+b1-(a2/2)'],
+        result:()=>10*2+7-8/2, resultLabel:'23'
+      }
+    ]
+  },
+  {
+    id:'sum', name:'SUM', icon:'Σ', color:'#0891b2',
+    desc:'Add up ranges of cells efficiently with SUM',
+    questions:[
+      {
+        scenario:'📊 Weekly Sales',
+        text:'A shop tracked daily sales in A1:A5. Use SUM to find the week\'s total.',
+        subtext:'SUM can add an entire column range at once.',
+        table:{headers:['A','B'],rows:[['Monday: 240',''],['Tuesday: 185',''],['Wednesday: 310',''],['Thursday: 195',''],['Friday: 420','']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=sum(a1:a5)'],
+        result:()=>240+185+310+195+420, resultLabel:'1350'
+      },
+      {
+        scenario:'🏫 Report Cards',
+        text:'A student\'s test scores are in B1:B4. What is their total marks using SUM?',
+        subtext:'SUM works on any column — not just A.',
+        table:{headers:['A','B'],rows:[['Math','88'],['Science','74'],['English','91'],['History','67'],['','']]},
+        hl:[[0,1],[1,1],[2,1],[3,1]], answers:['=sum(b1:b4)'],
+        result:()=>88+74+91+67, resultLabel:'320'
+      },
+      {
+        scenario:'🌡 Temperature Log',
+        text:'Only the last 3 days\' temperatures matter (A3:A5). Sum just those.',
+        subtext:'Your range doesn\'t have to start at row 1.',
+        table:{headers:['A'],rows:[['22'],['19'],['31'],['28'],['26']]},
+        hl:[[2,0],[3,0],[4,0]], answers:['=sum(a3:a5)'],
+        result:()=>31+28+26, resultLabel:'85'
+      },
+      {
+        scenario:'💳 Budget Tracker',
+        text:'Expenses are in A1:A3 and B1:B3. Use SUM on the whole block to get total spending.',
+        subtext:'SUM can cover a rectangular range across multiple columns.',
+        table:{headers:['A','B'],rows:[['Rent: 800','Food: 250'],['Transport: 120','Clothes: 85'],['Phone: 60','Entertainment: 95'],['',''],['','']]},
+        hl:[[0,0],[0,1],[1,0],[1,1],[2,0],[2,1]], answers:['=sum(a1:b3)'],
+        result:()=>800+250+120+85+60+95, resultLabel:'1410'
+      },
+      {
+        scenario:'⚽ Season Goals',
+        text:'A player\'s goals per game are in A2:A5. Find their season total.',
+        subtext:'SUM across a mid-range — not always from row 1.',
+        table:{headers:['A'],rows:[['Game','2'],['1'],['3'],['0'],['2']]},
+        hl:[[1,0],[2,0],[3,0],[4,0]], answers:['=sum(a2:a5)'],
+        result:()=>2+1+3+0+2, resultLabel:'8'
+      },
+      {
+        scenario:'🎓 Fundraising Goal',
+        text:'Classes raised money shown in A1:A5. They also got a donation of B1. Write a SUM that includes all class money AND the donation.',
+        subtext:'Combine a range and an extra cell.',
+        table:{headers:['A','B'],rows:[['Class 1: 150','Donation: 500'],['Class 2: 200',''],['Class 3: 175',''],['Class 4: 220',''],['Class 5: 195','']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0],[0,1]], answers:['=sum(a1:a5)+b1','=sum(a1:a5,b1)','=b1+sum(a1:a5)','=sum(a1:a5)+b1'],
+        result:()=>150+200+175+220+195+500, resultLabel:'1440'
+      },
+      {
+        scenario:'🏪 Stock Count',
+        text:'Two shelves have items: A1:A3 (shelf 1) and B1:B3 (shelf 2). Use one SUM formula for everything.',
+        subtext:'One SUM formula can cover a wide rectangular range.',
+        table:{headers:['A','B'],rows:[['12','8'],['15','6'],['9','11'],['',''],['','']]},
+        hl:[[0,0],[0,1],[1,0],[1,1],[2,0],[2,1]], answers:['=sum(a1:b3)'],
+        result:()=>12+8+15+6+9+11, resultLabel:'61'
+      },
+      {
+        scenario:'🧾 Invoice',
+        text:'Item prices are in B1:B5. Sum only the first item and last item (B1 and B5) without SUM. Then write a SUM for all 5.',
+        subtext:'Write the full range SUM for B1:B5.',
+        table:{headers:['A','B'],rows:[['Pencils','3.50'],['Notebooks','8.00'],['Folders','5.25'],['Markers','12.00'],['Tape','2.75']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=sum(b1:b5)'],
+        result:()=>3.50+8+5.25+12+2.75, resultLabel:'31.50'
+      },
+      {
+        scenario:'📈 Profit Analysis',
+        text:'Monthly profits are in A1:A6 (6 months). Find the total using SUM.',
+        subtext:'SUM works the same regardless of range length.',
+        table:{headers:['A'],rows:[['Jan: 4200'],['Feb: 3800'],['Mar: 5100'],['Apr: 4700'],['May: 6200'],['Jun: 5500']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0]], answers:['=sum(a1:a6)'],
+        result:()=>4200+3800+5100+4700+6200+5500, resultLabel:'29500'
+      },
+      {
+        scenario:'🏆 Grand Challenge',
+        text:'Team A scores are in A1:A5, Team B in B1:B5. Find the difference between Team A total and Team B total.',
+        subtext:'Use two SUM functions and subtract them.',
+        table:{headers:['A','B'],rows:[['8','6'],['5','9'],['7','7'],['10','4'],['6','8']]},
+        hl:[[0,0],[0,1],[1,0],[1,1],[2,0],[2,1],[3,0],[3,1],[4,0],[4,1]], answers:['=sum(a1:a5)-sum(b1:b5)','=(sum(a1:a5))-(sum(b1:b5))'],
+        result:()=>(8+5+7+10+6)-(6+9+7+4+8), resultLabel:'2'
+      }
+    ]
+  },
+  {
+    id:'average', name:'AVERAGE', icon:'x̄', color:'#059669',
+    desc:'Find the mean (average) of a range of numbers',
+    questions:[
+      {
+        scenario:'📝 Quiz Scores',
+        text:'A student scored the marks in A1:A5. What is their average quiz score?',
+        subtext:'AVERAGE adds all values and divides by the count.',
+        table:{headers:['A'],rows:[['72'],['85'],['91'],['68'],['79']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=average(a1:a5)'],
+        result:()=>(72+85+91+68+79)/5, resultLabel:'79'
+      },
+      {
+        scenario:'🌡 Weather Station',
+        text:'Daily high temperatures are in B1:B5. Find the average temperature for the week.',
+        subtext:'AVERAGE works the same on any column.',
+        table:{headers:['A','B'],rows:[['Mon','28'],['Tue','31'],['Wed','24'],['Thu','29'],['Fri','33']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=average(b1:b5)'],
+        result:()=>(28+31+24+29+33)/5, resultLabel:'29'
+      },
+      {
+        scenario:'🏋️ Training Log',
+        text:'A coach only cares about the middle three sessions (A2:A4). Find the average of those.',
+        subtext:'You control which rows go in your range.',
+        table:{headers:['A'],rows:[['45'],['62'],['58'],['71'],['49']]},
+        hl:[[1,0],[2,0],[3,0]], answers:['=average(a2:a4)'],
+        result:()=>(62+58+71)/3, resultLabel:'63.67'
+      },
+      {
+        scenario:'📊 Class Performance',
+        text:'Two classes took the same test. Scores for class A are in A1:A4 and class B in B1:B4. Find the overall average for everyone combined.',
+        subtext:'AVERAGE can span multiple columns.',
+        table:{headers:['A','B'],rows:[['78','82'],['85','79'],['91','88'],['74','93']]},
+        hl:[[0,0],[0,1],[1,0],[1,1],[2,0],[2,1],[3,0],[3,1]], answers:['=average(a1:b4)'],
+        result:()=>(78+82+85+79+91+88+74+93)/8, resultLabel:'83.75'
+      },
+      {
+        scenario:'💵 Hourly Pay',
+        text:'An employee worked different hours each day (B1:B5). Find their average daily hours.',
+        subtext:'AVERAGE works for any kind of number — not just test scores.',
+        table:{headers:['A','B'],rows:[['Mon','7.5'],['Tue','8'],['Wed','6.5'],['Thu','9'],['Fri','8']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=average(b1:b5)'],
+        result:()=>(7.5+8+6.5+9+8)/5, resultLabel:'7.8'
+      },
+      {
+        scenario:'🎮 Gaming Leaderboard',
+        text:'A player\'s scores for 6 rounds are in A1:A6. What is their average score per round?',
+        subtext:'AVERAGE works with 6 values just as easily as 5.',
+        table:{headers:['A'],rows:[['1200'],['950'],['1450'],['1100'],['1300'],['1050']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0]], answers:['=average(a1:a6)'],
+        result:()=>(1200+950+1450+1100+1300+1050)/6, resultLabel:'1175'
+      },
+      {
+        scenario:'🏠 Real Estate',
+        text:'House prices in a neighbourhood are in A2:A5 (ignoring the header in A1). Find the average price.',
+        subtext:'Exclude row 1 (the header) from your range.',
+        table:{headers:['A'],rows:[['Price ($)'],['450000'],['380000'],['520000'],['410000']]},
+        hl:[[1,0],[2,0],[3,0],[4,0]], answers:['=average(a2:a5)'],
+        result:()=>(450000+380000+520000+410000)/4, resultLabel:'440000'
+      },
+      {
+        scenario:'🧪 Science Experiment',
+        text:'Three trials were run. Each trial has two measurements in columns A and B. Find the average of ALL six measurements.',
+        subtext:'Think about what range covers all 6 values.',
+        table:{headers:['A','B'],rows:[['12.4','11.9'],['13.1','12.7'],['12.8','13.2'],['',''],['','']]},
+        hl:[[0,0],[0,1],[1,0],[1,1],[2,0],[2,1]], answers:['=average(a1:b3)'],
+        result:()=>(12.4+11.9+13.1+12.7+12.8+13.2)/6, resultLabel:'12.68'
+      },
+      {
+        scenario:'🎓 Grade Boundaries',
+        text:'A student needs to know if their AVERAGE of A1:A5 beats the passing mark of 60. First, find their average.',
+        subtext:'Calculate the average — you\'ll compare it mentally.',
+        table:{headers:['A'],rows:[['55'],['72'],['48'],['65'],['61']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=average(a1:a5)'],
+        result:()=>(55+72+48+65+61)/5, resultLabel:'60.2 ✓ Pass!'
+      },
+      {
+        scenario:'🏆 Challenge: Spread',
+        text:'Find how far the AVERAGE of A1:A5 is above the minimum. Subtract MIN from AVERAGE.',
+        subtext:'Combine two functions: AVERAGE and MIN.',
+        table:{headers:['A'],rows:[['80'],['45'],['70'],['90'],['60']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=average(a1:a5)-min(a1:a5)','=(average(a1:a5))-min(a1:a5)'],
+        result:()=>(80+45+70+90+60)/5-45, resultLabel:'24'
+      }
+    ]
+  },
+  {
+    id:'max', name:'MAX', icon:'↑', color:'#dc2626',
+    desc:'Find the highest (maximum) value in a range',
+    questions:[
+      {
+        scenario:'🏅 Track Meet',
+        text:'Five athletes\' jump distances are in A1:A5. Which is the longest jump? Use MAX.',
+        subtext:'MAX returns the single largest number in the range.',
+        table:{headers:['A'],rows:[['5.82'],['6.10'],['5.95'],['6.33'],['6.08']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=max(a1:a5)'],
+        result:()=>6.33, resultLabel:'6.33 m'
+      },
+      {
+        scenario:'🌡 Heatwave',
+        text:'Hourly temperatures are in B1:B5. Find the peak temperature of the day.',
+        subtext:'MAX finds the highest value — perfect for peaks.',
+        table:{headers:['A','B'],rows:[['10am','28'],['12pm','35'],['2pm','38'],['4pm','33'],['6pm','29']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=max(b1:b5)'],
+        result:()=>38, resultLabel:'38°C'
+      },
+      {
+        scenario:'💰 Sales Contest',
+        text:'Sales figures for the week are in A1:A5. Award the prize to whoever made the most. Find the highest sales number.',
+        subtext:'MAX across column A.',
+        table:{headers:['A'],rows:[['1250'],['980'],['1640'],['1420'],['1180']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=max(a1:a5)'],
+        result:()=>1640, resultLabel:'$1640'
+      },
+      {
+        scenario:'🏫 Exam Results',
+        text:'The exam scores across TWO classes are in A1:A4 (class 1) and B1:B4 (class 2). Find the single highest score from BOTH classes.',
+        subtext:'MAX can span a rectangular range across columns.',
+        table:{headers:['A','B'],rows:[['72','85'],['91','78'],['68','94'],['83','71']]},
+        hl:[[0,0],[0,1],[1,0],[1,1],[2,0],[2,1],[3,0],[3,1]], answers:['=max(a1:b4)'],
+        result:()=>94, resultLabel:'94'
+      },
+      {
+        scenario:'📦 Biggest Order',
+        text:'Order quantities are in A2:A5 (row 1 is a header). Find the largest single order.',
+        subtext:'Exclude the header row from your range.',
+        table:{headers:['A'],rows:[['Quantity'],['45'],['120'],['78'],['200']]},
+        hl:[[1,0],[2,0],[3,0],[4,0]], answers:['=max(a2:a5)'],
+        result:()=>200, resultLabel:'200 units'
+      },
+      {
+        scenario:'🎵 Top Chart',
+        text:'Streaming counts (in thousands) for 5 songs are in B1:B5. Which song streamed the most?',
+        subtext:'MAX returns a single value — the highest one.',
+        table:{headers:['A','B'],rows:[['Song A','842'],['Song B','1205'],['Song C','967'],['Song D','1189'],['Song E','734']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=max(b1:b5)'],
+        result:()=>1205, resultLabel:'1205k'
+      },
+      {
+        scenario:'🚗 Speed Trap',
+        text:'A speed camera recorded 6 car speeds in A1:A6. Find the fastest speed recorded.',
+        subtext:'MAX works with 6 or more values too.',
+        table:{headers:['A'],rows:[['68'],['72'],['55'],['89'],['64'],['71']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0]], answers:['=max(a1:a6)'],
+        result:()=>89, resultLabel:'89 km/h'
+      },
+      {
+        scenario:'💡 Thinking Further',
+        text:'Scores are in A1:A5. How much higher is the MAX score than the AVERAGE score? Subtract AVERAGE from MAX.',
+        subtext:'Combine MAX and AVERAGE in one formula.',
+        table:{headers:['A'],rows:[['60'],['45'],['80'],['75'],['55']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=max(a1:a5)-average(a1:a5)','=(max(a1:a5))-(average(a1:a5))'],
+        result:()=>80-(60+45+80+75+55)/5, resultLabel:'17'
+      },
+      {
+        scenario:'📅 Best Month',
+        text:'Revenue for 6 months is in A1:A6. Find the best month\'s revenue.',
+        subtext:'MAX across 6 cells works exactly the same.',
+        table:{headers:['A'],rows:[['8200'],['7450'],['9100'],['8750'],['10200'],['9600']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0]], answers:['=max(a1:a6)'],
+        result:()=>10200, resultLabel:'$10,200'
+      },
+      {
+        scenario:'🏆 Championship',
+        text:'Players\' stats span A1:C3 (a 3×3 table). Find the single highest value in the ENTIRE table.',
+        subtext:'MAX works on any rectangular range.',
+        table:{headers:['A','B','C'],rows:[['85','92','78'],['91','88','95'],['76','83','89']]},
+        hl:[[0,0],[0,1],[0,2],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2]], answers:['=max(a1:c3)'],
+        result:()=>95, resultLabel:'95'
+      }
+    ]
+  },
+  {
+    id:'min', name:'MIN', icon:'↓', color:'#2563eb',
+    desc:'Find the lowest (minimum) value in a range',
+    questions:[
+      {
+        scenario:'🏃 Personal Best',
+        text:'A runner\'s race times in seconds are in A1:A5. Their personal best is the LOWEST time. Find it.',
+        subtext:'MIN returns the smallest number in the range.',
+        table:{headers:['A'],rows:[['58.4'],['61.2'],['57.8'],['59.1'],['60.5']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=min(a1:a5)'],
+        result:()=>57.8, resultLabel:'57.8 sec'
+      },
+      {
+        scenario:'🥶 Cold Snap',
+        text:'Night-time temperatures for the week are in B1:B5. What was the coldest night?',
+        subtext:'MIN finds the lowest temperature — the coldest reading.',
+        table:{headers:['A','B'],rows:[['Mon','-3'],['Tue','-7'],['Wed','-1'],['Thu','-9'],['Fri','-5']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=min(b1:b5)'],
+        result:()=>-9, resultLabel:'-9°C'
+      },
+      {
+        scenario:'🛒 Cheapest Price',
+        text:'Five stores sell the same item. Prices are in A1:A5. Find the cheapest price.',
+        subtext:'MIN works great for finding the best (lowest) price.',
+        table:{headers:['A'],rows:[['24.99'],['19.50'],['22.75'],['18.00'],['21.99']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=min(a1:a5)'],
+        result:()=>18.00, resultLabel:'$18.00'
+      },
+      {
+        scenario:'📋 Attendance Record',
+        text:'Student attendance percentages for 4 subjects are in B1:B4. Flag the subject with the lowest attendance.',
+        subtext:'MIN across column B.',
+        table:{headers:['A','B'],rows:[['Math','92'],['English','78'],['Science','85'],['History','71'],['','']]},
+        hl:[[0,1],[1,1],[2,1],[3,1]], answers:['=min(b1:b4)'],
+        result:()=>71, resultLabel:'71%'
+      },
+      {
+        scenario:'🔋 Battery Life',
+        text:'Battery readings across two phones (A1:B3) show percentage remaining. Find the lowest reading across both phones.',
+        subtext:'MIN can span multiple columns.',
+        table:{headers:['A','B'],rows:[['Phone 1','Phone 2'],['78','45'],['62','83'],['29','71']]},
+        hl:[[1,0],[1,1],[2,0],[2,1],[3,0],[3,1]], answers:['=min(a2:b4)','=min(b2:a4)'],
+        result:()=>29, resultLabel:'29%'
+      },
+      {
+        scenario:'🌊 Tide Chart',
+        text:'Sea level measurements in metres are in A2:A6 (row 1 is a header label). What is the lowest tide?',
+        subtext:'Start your range at A2 to skip the header.',
+        table:{headers:['A'],rows:[['Level (m)'],['2.4'],['1.8'],['0.9'],['1.5'],['2.1']]},
+        hl:[[1,0],[2,0],[3,0],[4,0],[5,0]], answers:['=min(a2:a6)'],
+        result:()=>0.9, resultLabel:'0.9 m'
+      },
+      {
+        scenario:'📉 Stock Dip',
+        text:'A stock\'s closing prices over 5 days are in A1:A5. Find the lowest closing price (the biggest dip).',
+        subtext:'MIN finds the worst-performing day.',
+        table:{headers:['A'],rows:[['142.50'],['138.20'],['145.80'],['131.90'],['139.40']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=min(a1:a5)'],
+        result:()=>131.90, resultLabel:'$131.90'
+      },
+      {
+        scenario:'🎓 Grade Safety Net',
+        text:'A student wants to know their lowest mark so they know what to study. Marks are in A1:A5. Find the minimum.',
+        subtext:'Always useful to know your weakest area!',
+        table:{headers:['A'],rows:[['88'],['72'],['95'],['64'],['81']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=min(a1:a5)'],
+        result:()=>64, resultLabel:'64 — study this!'
+      },
+      {
+        scenario:'💡 Gap Analysis',
+        text:'How far below the AVERAGE is the MIN score? Subtract MIN from AVERAGE for A1:A5.',
+        subtext:'Combine AVERAGE and MIN — the gap shows the weakest outlier.',
+        table:{headers:['A'],rows:[['70'],['85'],['40'],['90'],['75']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=average(a1:a5)-min(a1:a5)','=(average(a1:a5))-min(a1:a5)'],
+        result:()=>(70+85+40+90+75)/5-40, resultLabel:'32'
+      },
+      {
+        scenario:'🏆 Range Challenge',
+        text:'Find the range (MAX minus MIN) for the dataset in A1:A5. This tells you how spread out the data is.',
+        subtext:'A common stats calculation: MAX − MIN = range.',
+        table:{headers:['A'],rows:[['15'],['42'],['8'],['37'],['22']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=max(a1:a5)-min(a1:a5)','=(max(a1:a5))-(min(a1:a5))'],
+        result:()=>42-8, resultLabel:'34'
+      }
+    ]
+  },
+  {
+    id:'count', name:'COUNT', icon:'#', color:'#7c3aed',
+    desc:'Count how many cells contain NUMBERS (not text)',
+    questions:[
+      {
+        scenario:'📝 Incomplete Gradebook',
+        text:'Some students haven\'t submitted yet (blank cells). A1:A5 has marks for those who did. How many marks are recorded?',
+        subtext:'COUNT only counts cells with numbers — blanks are ignored.',
+        table:{headers:['A'],rows:[['78'],[''],['85'],[''],['92']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=count(a1:a5)'],
+        result:()=>3, resultLabel:'3 students'
+      },
+      {
+        scenario:'🌡 Sensor Data',
+        text:'A weather sensor recorded readings in B1:B5, but had errors (blank) twice. How many valid readings are there?',
+        subtext:'COUNT ignores empty cells automatically.',
+        table:{headers:['A','B'],rows:[['Reading 1','21.5'],['Reading 2',''],['Reading 3','19.8'],['Reading 4','22.1'],['Reading 5','']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=count(b1:b5)'],
+        result:()=>3, resultLabel:'3 readings'
+      },
+      {
+        scenario:'🏥 Patient Records',
+        text:'A1:A5 contains patient ages, but some entries are missing. How many patients have their age recorded?',
+        subtext:'COUNT is perfect for checking data completeness.',
+        table:{headers:['A'],rows:[['45'],[''],['32'],['67'],['51']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=count(a1:a5)'],
+        result:()=>4, resultLabel:'4 patients'
+      },
+      {
+        scenario:'🔢 Mixed Data',
+        text:'Column A has a mix of numbers, text, and blanks. COUNT only picks up the numbers. How many?',
+        subtext:'COUNT skips text entries — it only counts numbers.',
+        table:{headers:['A'],rows:[['42'],['hello'],[''],['18'],['world']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=count(a1:a5)'],
+        result:()=>2, resultLabel:'2 numbers'
+      },
+      {
+        scenario:'📊 Survey Results',
+        text:'Numeric ratings are in A1:A5 but two people skipped the question (blank). Count the responses.',
+        subtext:'COUNT tells you how many people actually answered.',
+        table:{headers:['A'],rows:[['4'],[''],['3'],['5'],['4']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=count(a1:a5)'],
+        result:()=>4, resultLabel:'4 responses'
+      },
+      {
+        scenario:'🏫 Attendance Numbers',
+        text:'Student absence counts are in B1:B5. Some students have no absences recorded yet (blank). How many have a number entered?',
+        subtext:'COUNT tells you how many records exist.',
+        table:{headers:['A','B'],rows:[['Alice','3'],['Bob',''],['Carol','1'],['Dave',''],['Eve','5']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=count(b1:b5)'],
+        result:()=>3, resultLabel:'3 records'
+      },
+      {
+        scenario:'🔬 Lab Results',
+        text:'Lab measurements span A1:B3. Some cells are blank (not yet measured). Count ALL numeric entries in the full table.',
+        subtext:'COUNT works across a multi-column rectangular range.',
+        table:{headers:['A','B'],rows:[['12.4',''],['','8.9'],['15.1','11.3'],['',''],['','']]},
+        hl:[[0,0],[0,1],[1,0],[1,1],[2,0],[2,1]], answers:['=count(a1:b3)'],
+        result:()=>4, resultLabel:'4 measurements'
+      },
+      {
+        scenario:'💼 Job Applications',
+        text:'Only rows A2:A5 have applicant test scores (A1 is a header). Some haven\'t tested yet. Count the scores.',
+        subtext:'Start at A2 to skip the header row.',
+        table:{headers:['A'],rows:[['Test Score'],['85'],[''],['72'],['91']]},
+        hl:[[1,0],[2,0],[3,0],[4,0]], answers:['=count(a2:a5)'],
+        result:()=>3, resultLabel:'3 applicants tested'
+      },
+      {
+        scenario:'🤔 COUNT vs COUNTA',
+        text:'Column A has names (text) and Column B has their scores. COUNT on A1:A5 returns 0. Try counting B1:B5 instead.',
+        subtext:'COUNT only counts numbers — text returns 0.',
+        table:{headers:['A','B'],rows:[['Alice','88'],['Bob',''],['Carol','76'],['Dave',''],['Eve','91']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=count(b1:b5)'],
+        result:()=>3, resultLabel:'3 (not 5!)'
+      },
+      {
+        scenario:'🏆 Challenge: Completion Rate',
+        text:'8 assignments are possible. Students completed some: A1:A4 has marks (some blank). COUNT them, then write the formula.',
+        subtext:'COUNT gives you the numerator for a completion percentage.',
+        table:{headers:['A'],rows:[['78'],[''],['85'],[''],['',],['92'],[''],['88']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]], answers:['=count(a1:a8)'],
+        result:()=>4, resultLabel:'4 of 8 done'
+      }
+    ]
+  },
+  {
+    id:'counta', name:'COUNTA', icon:'Aa', color:'#0891b2',
+    desc:'Count ALL non-empty cells — numbers AND text',
+    questions:[
+      {
+        scenario:'📋 Sign-in Sheet',
+        text:'Students signed in by writing their name in A1:A5. Two spots are blank (absent). How many signed in?',
+        subtext:'COUNTA counts ANY non-empty cell — text or number.',
+        table:{headers:['A'],rows:[['Alice'],['Bob'],[''],['Dave'],['Eve']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=counta(a1:a5)'],
+        result:()=>4, resultLabel:'4 students'
+      },
+      {
+        scenario:'✅ Task Tracker',
+        text:'Task statuses are in B1:B5 (either "Done", "In Progress", or blank for not started). How many tasks have ANY status?',
+        subtext:'COUNTA counts cells that have something written in them.',
+        table:{headers:['A','B'],rows:[['Task 1','Done'],['Task 2',''],['Task 3','In Progress'],['Task 4','Done'],['Task 5','']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=counta(b1:b5)'],
+        result:()=>3, resultLabel:'3 tasks started'
+      },
+      {
+        scenario:'📦 Product List',
+        text:'A product catalogue has item names in A1:A5, but 2 spots are reserved (blank). How many products are listed?',
+        subtext:'Names are text — use COUNTA, not COUNT.',
+        table:{headers:['A'],rows:[['Pencil'],['Ruler'],[''],['Notebook'],['']],},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=counta(a1:a5)'],
+        result:()=>3, resultLabel:'3 products'
+      },
+      {
+        scenario:'🔄 Mixed Column',
+        text:'Column A has a mix of text AND numbers — COUNTA counts both. How many non-empty cells in A1:A5?',
+        subtext:'This is the KEY difference: COUNTA counts text; COUNT does not.',
+        table:{headers:['A'],rows:[['hello'],['42'],[''],['world'],['7']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=counta(a1:a5)'],
+        result:()=>4, resultLabel:'4 (vs COUNT=2)'
+      },
+      {
+        scenario:'📝 Survey Responses',
+        text:'A feedback form has written comments in B1:B5. Two people left it blank. Count the responses.',
+        subtext:'Written comments are text — COUNTA handles that.',
+        table:{headers:['A','B'],rows:[['Q1','Great class!'],['Q2',''],['Q3','Very helpful'],['Q4','Could be better'],['Q5','']]},
+        hl:[[0,1],[1,1],[2,1],[3,1],[4,1]], answers:['=counta(b1:b5)'],
+        result:()=>3, resultLabel:'3 responses'
+      },
+      {
+        scenario:'🗓 Calendar Events',
+        text:'Events are listed in A2:A6 (row 1 is a heading). Some days have no event (blank). How many events are scheduled?',
+        subtext:'Skip the header — start at A2.',
+        table:{headers:['A'],rows:[['Event'],['Assembly'],[''],['Science Fair'],[''],['Sports Day']]},
+        hl:[[1,0],[2,0],[3,0],[4,0],[5,0]], answers:['=counta(a2:a6)'],
+        result:()=>3, resultLabel:'3 events'
+      },
+      {
+        scenario:'📊 Data Audit',
+        text:'A table (A1:B4) has some cells filled and some empty. COUNTA counts everything non-blank. How many cells have data?',
+        subtext:'COUNTA over a multi-column range.',
+        table:{headers:['A','B'],rows:[['100','yes'],['','no'],['200',''],['','yes']]},
+        hl:[[0,0],[0,1],[1,0],[1,1],[2,0],[2,1],[3,0],[3,1]], answers:['=counta(a1:b4)'],
+        result:()=>6, resultLabel:'6 cells'
+      },
+      {
+        scenario:'🎓 Class Register',
+        text:'Names in A1:A5, but the last row is blank (seat not assigned). COUNT gives 0 because names are text. Use COUNTA.',
+        subtext:'When your data is text, COUNT fails — COUNTA is correct.',
+        table:{headers:['A'],rows:[['Jamie'],['Taylor'],['Morgan'],['Riley'],['']],},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=counta(a1:a5)'],
+        result:()=>4, resultLabel:'4 students'
+      },
+      {
+        scenario:'🔍 Choosing the Right Tool',
+        text:'Column A has student names, column B has their scores (some missing). COUNTA(A1:A5) counts names. What does it return?',
+        subtext:'Predict AND verify: how many names are in A1:A5?',
+        table:{headers:['A','B'],rows:[['Sam','85'],['Lee',''],['Priya','92'],['Jordan','78'],['Alex','']]},
+        hl:[[0,0],[1,0],[2,0],[3,0],[4,0]], answers:['=counta(a1:a5)'],
+        result:()=>5, resultLabel:'5 — all have names'
+      },
+      {
+        scenario:'🏆 COUNTA Challenge',
+        text:'A school tracks which clubs each student joined. The table A1:B5 has club names (text) or is blank. Count ALL entries.',
+        subtext:'COUNTA on a multi-column range with text data.',
+        table:{headers:['A','B'],rows:[['Drama','Chess'],['','Soccer'],['Band',''],['Drama','Art'],['','Chess']]},
+        hl:[[0,0],[0,1],[1,0],[1,1],[2,0],[2,1],[3,0],[3,1],[4,0],[4,1]], answers:['=counta(a1:b5)'],
+        result:()=>8, resultLabel:'8 club spots'
+      }
+    ]
+  }
+];
+
+// =====================================================================
+// CATEGORY EXAMPLES & WHY DATA (Fix 1 & 4)
+// =====================================================================
+const CAT_META = {
+  math: {
+    why: "Spreadsheets are smarter than calculators — instead of retyping numbers, you reference cells directly. When a price changes, every formula updates instantly.",
+    whyTitle: "Formulas reference cells, not values",
+    icon: "🧮",
+    example_formula: "=A1+B1",
+    example_formula_html: '<span class="ef-eq">=</span><span class="ef-range">A1</span>+<span class="ef-range">B1</span>',
+    example_desc: "Click cell A1, type +, then click B1. Always start with = to tell Sheets it's a formula.",
+    example_table: {headers:['A','B'],rows:[['Price','Tax'],['10.00','1.50'],['',''],['','']]},
+    example_hl: [[1,0],[1,1]],
+    example_result: "= 11.50"
+  },
+  sum: {
+    why: "Adding 100 cells one by one takes forever and makes mistakes. SUM does it in one step. It's the most-used formula in every real spreadsheet in the world.",
+    whyTitle: "SUM — add an entire range instantly",
+    icon: "Σ",
+    example_formula: "=SUM(A2:A5)",
+    example_formula_html: '<span class="ef-eq">=</span><span class="ef-fn">SUM</span>(<span class="ef-range">A2:A5</span>)',
+    example_desc: "Type =SUM( then drag to select the range A2:A5, then the ) closes automatically.",
+    example_table: {headers:['A'],rows:[['Sales'],['120'],['85'],['200'],['95']]},
+    example_hl: [[1,0],[2,0],[3,0],[4,0]],
+    example_result: "= 500"
+  },
+  average: {
+    why: "One number rarely tells the whole story. AVERAGE shows the typical value — used in report cards, pay calculations, weather forecasts, and business dashboards every single day.",
+    whyTitle: "AVERAGE — find the middle ground",
+    icon: "x̄",
+    example_formula: "=AVERAGE(B2:B5)",
+    example_formula_html: '<span class="ef-eq">=</span><span class="ef-fn">AVERAGE</span>(<span class="ef-range">B2:B5</span>)',
+    example_desc: "Same range syntax as SUM — just swap the function name. The result is the mean of all values.",
+    example_table: {headers:['A','B'],rows:[['Subject','Score'],['Math','72'],['English','88'],['Science','64'],['History','80']]},
+    example_hl: [[1,1],[2,1],[3,1],[4,1]],
+    example_result: "= 76"
+  },
+  max: {
+    why: "Finding the highest value in a list is something every spreadsheet user does — top sales, fastest time, highest temperature. MAX finds it instantly, even across thousands of rows.",
+    whyTitle: "MAX — find the highest value",
+    icon: "↑",
+    example_formula: "=MAX(A2:A5)",
+    example_formula_html: '<span class="ef-eq">=</span><span class="ef-fn">MAX</span>(<span class="ef-range">A2:A5</span>)',
+    example_desc: "MAX scans every cell in the range and returns only the single largest number.",
+    example_table: {headers:['A'],rows:[['Time (sec)'],['58.2'],['61.0'],['54.7'],['59.3']]},
+    example_hl: [[1,0],[2,0],[3,0],[4,0]],
+    example_result: "= 61.0"
+  },
+  min: {
+    why: "The flip side of MAX — the lowest value matters just as much. Best race time, cheapest price, coldest night, lowest score. MIN finds it with zero effort.",
+    whyTitle: "MIN — find the lowest value",
+    icon: "↓",
+    example_formula: "=MIN(A2:A5)",
+    example_formula_html: '<span class="ef-eq">=</span><span class="ef-fn">MIN</span>(<span class="ef-range">A2:A5</span>)',
+    example_desc: "MIN returns the single smallest number in the range — ignoring everything else.",
+    example_table: {headers:['A'],rows:[['Price ($)'],['24.99'],['18.50'],['22.00'],['19.75']]},
+    example_hl: [[1,0],[2,0],[3,0],[4,0]],
+    example_result: "= 18.50"
+  },
+  count: {
+    why: "Real data is messy — cells get left blank. COUNT tells you exactly how many numeric entries exist so you know how many people responded, how many tests were taken, or how many sales were recorded.",
+    whyTitle: "COUNT — count numeric entries only",
+    icon: "#",
+    example_formula: "=COUNT(A2:A6)",
+    example_formula_html: '<span class="ef-eq">=</span><span class="ef-fn">COUNT</span>(<span class="ef-range">A2:A6</span>)',
+    example_desc: "COUNT skips blank cells AND text. Only numbers are counted. Watch — 5 rows but only 3 numbers.",
+    example_table: {headers:['A'],rows:[['Score'],['85'],[''],['72'],[''],['91']]},
+    example_hl: [[1,0],[2,0],[3,0],[4,0],[5,0]],
+    example_result: "= 3 (not 5!)"
+  },
+  counta: {
+    why: "When your data contains names, labels, or yes/no answers, COUNT returns zero because it ignores text. COUNTA counts ANYTHING non-empty — the essential tool for lists and surveys.",
+    whyTitle: "COUNTA — count any non-empty cell",
+    icon: "Aa",
+    example_formula: "=COUNTA(A2:A6)",
+    example_formula_html: '<span class="ef-eq">=</span><span class="ef-fn">COUNTA</span>(<span class="ef-range">A2:A6</span>)',
+    example_desc: "COUNTA counts text AND numbers — anything that isn't blank. Notice it gives 3, not 5.",
+    example_table: {headers:['A'],rows:[['Name'],['Alice'],['Bob'],[''],['Carol'],['']  ]},
+    example_hl: [[1,0],[2,0],[3,0],[4,0],[5,0]],
+    example_result: "= 3 names"
+  }
+};
+
+// Track which categories have shown their example already this session
+const shownExamples = new Set();
+
+function showExample(catId) {
+  const meta = CAT_META[catId];
+  if (!meta) { startFirstQuestion(); return; }
+
+  // Populate the modal
+  document.getElementById('ex-title').textContent = meta.whyTitle;
+  document.getElementById('ex-why').textContent = meta.why;
+  document.getElementById('ex-formula-display').innerHTML = meta.example_formula_html;
+  document.getElementById('ex-formula-desc').textContent = meta.example_desc;
+  document.getElementById('ex-result-display').innerHTML = '✓ ' + meta.example_result;
+
+  // Build mini table
+  const tbl = document.getElementById('ex-table');
+  const {headers, rows} = meta.example_table;
+  const hl = meta.example_hl || [];
+  const isHL = (r,c) => hl.some(([hr,hc])=>hr===r&&hc===c);
+  let html = '<thead><tr><th></th>';
+  headers.forEach(h => html += `<th>${h}</th>`);
+  html += '</tr></thead><tbody>';
+  rows.forEach((row, ri) => {
+    html += `<tr><td class="rh">${ri+1}</td>`;
+    row.forEach((cell, ci) => {
+      html += `<td class="${isHL(ri,ci)?'hl':''}">${cell}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  tbl.innerHTML = html;
+
+  document.getElementById('example-overlay').classList.add('show');
+}
+
+function closeExample() {
+  document.getElementById('example-overlay').classList.remove('show');
+  // Show why banner after closing example
+  showWhyBanner(CATS[curCat].id);
+}
+
+function showWhyBanner(catId) {
+  const meta = CAT_META[catId];
+  if (!meta) return;
+  document.getElementById('why-icon').textContent = meta.icon;
+  document.getElementById('why-title').textContent = meta.whyTitle;
+  document.getElementById('why-text').textContent = meta.why;
+  document.getElementById('why-banner').classList.add('show');
+}
+
+function dismissWhy() {
+  document.getElementById('why-banner').classList.remove('show');
+}
+
+// =====================================================================
+// SCORING & LEADERBOARD
+// =====================================================================
+const SCORE_BASE = 1000;       // points for correct answer
+const SCORE_TIME_BONUS = 500;  // max extra for speed (decays over 30s)
+const SCORE_FIRST_BONUS = 200; // bonus for 1st attempt correct
+const TIMER_SECONDS = 30;
+
+let timerInterval = null;
+let timerStart = null;
+let myName = null;        // student's chosen display name
+let myId = null;          // stable per-session ID
+let myTotalPts = 0;
+let myQAnswered = 0;
+let myQCorrect = 0;
+let prevRanks = {};       // for rank-change animation
+
+// ── Streak state ──
+let currentStreak = 0;
+let bestStreak = 0;
+let streakHideTimer = null;
+
+// Streak milestones: [minStreak, multiplier, label, burstEmoji]
+const STREAK_LEVELS = [
+  { min: 3,  mult: 1.25, label: 'On a roll!',     emoji: '🔥',       burstText: '🔥 3 Streak!' },
+  { min: 5,  mult: 1.5,  label: 'Heating up!',    emoji: '🔥🔥',     burstText: '🔥🔥 5 Streak!' },
+  { min: 8,  mult: 1.75, label: 'On fire!',        emoji: '🔥🔥🔥',   burstText: '🔥🔥🔥 8 Streak!' },
+  { min: 10, mult: 2.0,  label: 'LEGENDARY! 🏆',  emoji: '⚡🔥⚡',   burstText: '⚡ LEGENDARY 10! ⚡' },
+];
+
+function getStreakLevel(streak) {
+  // Return highest milestone reached
+  let level = null;
+  for (const l of STREAK_LEVELS) { if (streak >= l.min) level = l; }
+  return level;
+}
+
+function isStreakMilestone(streak) {
+  return STREAK_LEVELS.some(l => l.min === streak);
+}
+
+function updateStreak(wasCorrect) {
+  if (wasCorrect) {
+    currentStreak++;
+    if (currentStreak > bestStreak) bestStreak = currentStreak;
+  } else {
+    // Break streak on wrong final answer — but only when they exhaust attempts
+    // (called from checkAnswer only on correct, streak breaks on skip/wrong tracked separately)
+    currentStreak = 0;
+  }
+  renderStreakUI();
+}
+
+function breakStreak() {
+  if (currentStreak > 0) {
+    currentStreak = 0;
+    renderStreakUI();
+  }
+}
+
+function renderStreakUI() {
+  const level = getStreakLevel(currentStreak);
+  const badge = document.getElementById('streak-badge');
+  const hdr = document.getElementById('streak-hdr');
+
+  // Header badge — show if streak >= 3
+  if (currentStreak >= 3) {
+    badge.classList.add('show');
+    hdr.textContent = currentStreak;
+  } else {
+    badge.classList.remove('show');
+  }
+
+  // Streak bubble — only show when >= 3 and just answered
+  if (currentStreak >= 3 && level) {
+    const wrap = document.getElementById('streak-wrap');
+    document.getElementById('streak-num').textContent = currentStreak;
+    document.getElementById('streak-label').textContent = level.label;
+    document.getElementById('streak-mult').textContent = '×' + level.mult;
+
+    clearTimeout(streakHideTimer);
+    wrap.classList.add('show');
+    streakHideTimer = setTimeout(() => wrap.classList.remove('show'), 2800);
+
+    // Milestone burst — only on exact milestone numbers
+    if (isStreakMilestone(currentStreak)) {
+      showStreakBurst(level.burstText);
+    }
+  }
+}
+
+function showStreakBurst(text) {
+  const burst = document.getElementById('streak-burst');
+  const inner = document.getElementById('streak-burst-inner');
+  inner.textContent = text;
+  // Flash background orange briefly
+  burst.style.background = 'rgba(249,115,22,0.15)';
+  burst.classList.add('flash');
+  setTimeout(() => {
+    burst.classList.remove('flash');
+    burst.style.background = '';
+  }, 800);
+}
+
+function getStreakMultiplier() {
+  const level = getStreakLevel(currentStreak);
+  return level ? level.mult : 1.0;
+}
+
+// Avatar colours — deterministic from name
+const AVATAR_COLORS = ['#4f46e5','#0891b2','#16a34a','#dc2626','#d97706','#7c3aed','#db2777','#0284c7'];
+function avatarColor(name) {
+  let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+function initials(name) {
+  return name.trim().split(/\s+/).map(w=>w[0]?.toUpperCase()||'').slice(0,2).join('');
+}
+
+// ── Timer ──
+function startTimer() {
+  clearInterval(timerInterval);
+  timerStart = Date.now();
+  const bar = document.getElementById('timer-bar');
+  const lbl = document.getElementById('timer-label');
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  // Force reflow
+  bar.getBoundingClientRect();
+  bar.style.transition = 'width 1s linear';
+
+  timerInterval = setInterval(() => {
+    const elapsed = (Date.now() - timerStart) / 1000;
+    const remaining = Math.max(0, TIMER_SECONDS - elapsed);
+    const pct = (remaining / TIMER_SECONDS) * 100;
+    bar.style.width = pct + '%';
+    // Colour: green→yellow→red via background-position
+    const pos = (1 - pct/100) * 100;
+    bar.style.backgroundPosition = pos + '% 0';
+    const m = Math.floor(remaining / 60);
+    const s = Math.floor(remaining % 60);
+    lbl.textContent = m + ':' + String(s).padStart(2,'0');
+    if (remaining <= 0) { clearInterval(timerInterval); lbl.textContent = '⏰'; }
+  }, 250);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+function getElapsedSeconds() {
+  if (!timerStart) return TIMER_SECONDS;
+  return Math.min(TIMER_SECONDS, (Date.now() - timerStart) / 1000);
+}
+
+// ── Score calculation (with streak multiplier) ──
+function calcScore(elapsed, attemptNum) {
+  let base;
+  if (attemptNum > 1) {
+    base = Math.round(SCORE_BASE * 0.5); // half base, no bonuses
+  } else {
+    const timeBonus = Math.round(SCORE_TIME_BONUS * Math.max(0, 1 - elapsed / TIMER_SECONDS));
+    base = SCORE_BASE + timeBonus + SCORE_FIRST_BONUS;
+  }
+  // Apply streak multiplier AFTER working out base (so streak reward is visible)
+  const mult = getStreakMultiplier();
+  return Math.round(base * mult);
+}
+
+// ── Score toast ──
+function showScoreToast(pts, elapsed, attemptNum) {
+  // Update streak FIRST so multiplier shows correctly
+  updateStreak(true);
+
+  const toast = document.getElementById('score-toast');
+  document.getElementById('st-pts').textContent = '+' + pts.toLocaleString();
+  myTotalPts += pts;
+  myQAnswered++;
+  myQCorrect++;
+
+  const bonuses = [];
+  if (attemptNum === 1 && elapsed < TIMER_SECONDS * 0.5) bonuses.push('⚡ Speed!');
+  if (attemptNum === 1) bonuses.push('🎯 First try!');
+  const mult = getStreakMultiplier();
+  if (currentStreak >= 3) bonuses.push(`🔥 ×${mult} streak`);
+  document.getElementById('st-bonus').textContent = bonuses.join(' · ');
+  document.getElementById('st-total').textContent = 'Total: ' + myTotalPts.toLocaleString() + ' pts';
+
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+
+  // Update header score/streak
+  document.getElementById('lb-count').textContent = myTotalPts.toLocaleString();
+
+  // Save to shared leaderboard
+  if (myName) saveMyScore();
+}
+
+// ── Leaderboard storage (localStorage — per device) ──
+async function saveMyScore() {
+  if (!myName || !myId) return;
+  const entry = {
+    id: myId, name: myName,
+    pts: myTotalPts, q: myQAnswered, correct: myQCorrect,
+    bestStreak: bestStreak,
+    updated: Date.now()
+  };
+  try {
+    // Save this student's entry into the local scores list
+    const all = JSON.parse(localStorage.getItem('fl_scores') || '{}');
+    all[myId] = entry;
+    localStorage.setItem('fl_scores', JSON.stringify(all));
+  } catch(_) {}
+}
+
+async function loadLeaderboard() {
+  try {
+    const all = JSON.parse(localStorage.getItem('fl_scores') || '{}');
+    const entries = Object.values(all);
+    entries.sort((a,b) => b.pts - a.pts || b.q - a.q);
+    return entries;
+  } catch(_) { return []; }
+}
+
+function renderLeaderboard(entries) {
+  const tbody = document.getElementById('lb-tbody');
+  const empty = document.getElementById('lb-empty');
+
+  if (entries.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Update my stats
+  const myEntry = myId ? entries.find(e => e.id === myId) : null;
+  const myRank = myEntry ? entries.indexOf(myEntry) + 1 : null;
+
+  if (myEntry) {
+    document.getElementById('lb-my-pts').textContent = myEntry.pts.toLocaleString();
+    document.getElementById('lb-my-q').textContent = myEntry.q;
+    const acc = myEntry.q > 0 ? Math.round((myEntry.correct / myEntry.q) * 100) : 0;
+    document.getElementById('lb-my-acc').textContent = acc + '%';
+    document.getElementById('lb-my-rank').textContent = '#' + myRank;
+  }
+
+  tbody.innerHTML = entries.map((e, i) => {
+    const rank = i + 1;
+    const isMe = e.id === myId;
+    const acc = e.q > 0 ? Math.round((e.correct / e.q) * 100) : 0;
+    const rankClass = rank <= 3 ? 'r' + rank : '';
+    const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+
+    // Rank change indicator
+    const oldRank = prevRanks[e.id];
+    let moveHtml = '';
+    if (oldRank && oldRank !== rank) {
+      const diff = oldRank - rank;
+      moveHtml = diff > 0
+        ? `<span class="lb-move up">▲${diff}</span>`
+        : `<span class="lb-move down">▼${Math.abs(diff)}</span>`;
+    }
+    prevRanks[e.id] = rank;
+
+    const color = avatarColor(e.name);
+    const streakDisplay = e.bestStreak >= 3
+      ? `<span style="color:#f97316;font-weight:900">🔥${e.bestStreak}</span>`
+      : (e.bestStreak || 0);
+    return `<tr class="${isMe ? 'lb-me' : ''}">
+      <td><span class="lb-rank ${rankClass}">${rankEmoji}</span></td>
+      <td>
+        <div class="lb-name-cell">
+          <div class="lb-avatar" style="background:${color}">${initials(e.name)}</div>
+          <span>${e.name}${isMe ? ' (you)' : ''}${moveHtml}</span>
+        </div>
+      </td>
+      <td><span class="lb-pts">${e.pts.toLocaleString()}</span></td>
+      <td>${e.q}</td>
+      <td><span class="lb-accuracy">${acc}%</span></td>
+      <td style="text-align:right">${streakDisplay}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function openLeaderboard() {
+  document.getElementById('lb-overlay').classList.add('show');
+  // Show/hide name input row
+  document.getElementById('lb-name-row').style.display = myName ? 'none' : 'flex';
+  const entries = await loadLeaderboard();
+  renderLeaderboard(entries);
+}
+
+function closeLeaderboard() {
+  document.getElementById('lb-overlay').classList.remove('show');
+}
+
+async function refreshLeaderboard() {
+  document.getElementById('lb-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);font-weight:700">Loading…</td></tr>';
+  const entries = await loadLeaderboard();
+  renderLeaderboard(entries);
+}
+
+function joinLeaderboard() {
+  const input = document.getElementById('lb-name-input');
+  const name = input.value.trim();
+  if (!name) { input.style.borderColor = 'var(--red)'; return; }
+  input.style.borderColor = '';
+  myName = name;
+  // Generate stable session ID
+  myId = 'fl_' + Math.random().toString(36).slice(2,10);
+  try { localStorage.setItem('fl_lb_id', myId); localStorage.setItem('fl_lb_name', myName); } catch(_) {}
+  document.getElementById('lb-name-row').style.display = 'none';
+  if (myTotalPts > 0) saveMyScore();
+  refreshLeaderboard();
+}
+
+// Restore name from previous session
+function restoreLbSession() {
+  try {
+    const id = localStorage.getItem('fl_lb_id');
+    const name = localStorage.getItem('fl_lb_name');
+    if (id && name) {
+      myId = id; myName = name;
+      // Restore score so refreshing doesn't lose points
+      const all = JSON.parse(localStorage.getItem('fl_scores') || '{}');
+      const e = all[myId];
+      if (e) {
+        myTotalPts = e.pts || 0;
+        myQAnswered = e.q || 0;
+        myQCorrect = e.correct || 0;
+        bestStreak = e.bestStreak || 0;
+        document.getElementById('lb-count').textContent = myTotalPts.toLocaleString();
+        if (bestStreak >= 3) {
+          document.getElementById('streak-badge').classList.add('show');
+          document.getElementById('streak-hdr').textContent = bestStreak;
+        }
+      }
+    }
+  } catch(_) {}
+}
+
+// =====================================================================
+// STATE
+// =====================================================================
+let curCat = 0, curQ = 0, isAnswered = false, attempts = 0;
+let progress = CATS.map(()=>new Set());
+let totalDone = 0;
+
+// Sheet interaction state
+let ss = {
+  ar:-1,ac:-1,er:-1,ec:-1,
+  dragging:false,
+  rows:[],headers:[]
+};
+
+// ── Autofill state ──
+let af = {
+  active: false,
+  startRow: -1, startCol: -1, endRow: -1, endCol: -1,
+  selMinR: -1, selMaxR: -1, selMinC: -1, selMaxC: -1
+};
+
+function initFillHandle() {
+  const fh = document.getElementById('fill-handle');
+
+  // Mouse drag on fill handle
+  fh.addEventListener('mousedown', e => {
+    e.preventDefault();
+    e.stopPropagation(); // don't trigger cell mousedown
+    af.active = true;
+    af.selMinR = Math.min(ss.ar, ss.er);
+    af.selMaxR = Math.max(ss.ar, ss.er);
+    af.selMinC = Math.min(ss.ac, ss.ec);
+    af.selMaxC = Math.max(ss.ac, ss.ec);
+    af.endRow = af.selMaxR;
+    af.endCol = af.selMaxC;
+    document.body.style.cursor = 'crosshair';
+  });
+
+  // Touch drag on fill handle
+  fh.addEventListener('touchstart', e => {
+    e.stopPropagation();
+    af.active = true;
+    af.selMinR = Math.min(ss.ar, ss.er);
+    af.selMaxR = Math.max(ss.ar, ss.er);
+    af.selMinC = Math.min(ss.ac, ss.ec);
+    af.selMaxC = Math.max(ss.ac, ss.ec);
+    af.endRow = af.selMaxR;
+    af.endCol = af.selMaxC;
+  }, { passive: true });
+}
+
+// Track autofill drag over cells
+document.addEventListener('mousemove', e => {
+  if (!af.active) return;
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  if (el && el.classList.contains('data-cell')) {
+    const r = +el.dataset.ri, c = +el.dataset.ci;
+    // Only allow dragging DOWN or RIGHT from the selection
+    af.endRow = Math.max(af.selMaxR, r);
+    af.endCol = af.selMaxC; // keep same columns for now
+    updateAutofillPreview();
+  }
+});
+
+document.addEventListener('touchmove', e => {
+  if (!af.active) return;
+  const touch = e.touches[0];
+  const el = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (el && el.classList.contains('data-cell')) {
+    af.endRow = Math.max(af.selMaxR, +el.dataset.ri);
+    af.endCol = af.selMaxC;
+    updateAutofillPreview();
+  }
+}, { passive: true });
+
+// (mouseup handled by consolidated listener above)
+
+document.addEventListener('touchend', () => {
+  if (af.active) { af.active = false; doAutofill(); }
+});
+
+function updateAutofillPreview() {
+  const scroll = document.getElementById('sheet-scroll');
+  const afBox = document.getElementById('autofill-box');
+  const fc = document.querySelector(`td.data-cell[data-ri="${af.selMaxR+1}"][data-ci="${af.selMinC}"]`);
+  const lc = document.querySelector(`td.data-cell[data-ri="${af.endRow}"][data-ci="${af.endCol}"]`);
+  if (!fc || !lc || af.endRow <= af.selMaxR) { afBox.style.display = 'none'; return; }
+  const sr = scroll.getBoundingClientRect();
+  const fr = fc.getBoundingClientRect();
+  const lr = lc.getBoundingClientRect();
+  afBox.style.cssText = `display:block;top:${fr.top-sr.top+scroll.scrollTop}px;left:${fr.left-sr.left+scroll.scrollLeft}px;width:${lr.right-fr.left}px;height:${lr.bottom-fr.top}px`;
+}
+
+function doAutofill() {
+  document.getElementById('autofill-box').style.display = 'none';
+  if (af.endRow <= af.selMaxR) return;
+
+  // Get the source values from the selected range
+  const srcRows = [];
+  for (let r = af.selMinR; r <= af.selMaxR; r++) {
+    const rowVals = [];
+    for (let c = af.selMinC; c <= af.selMaxC; c++) {
+      const cell = document.querySelector(`td.data-cell[data-ri="${r}"][data-ci="${c}"]`);
+      rowVals.push(cell ? cell.textContent.trim() : '');
+    }
+    srcRows.push(rowVals);
+  }
+
+  // Detect if values are numeric and sequential (for smart fill)
+  const isSingleCol = af.selMinC === af.selMaxC;
+  let step = null;
+  if (isSingleCol && srcRows.length >= 2) {
+    const vals = srcRows.map(r => parseFloat(r[0]));
+    if (vals.every(v => !isNaN(v))) {
+      // Calculate average step across source
+      step = (vals[vals.length - 1] - vals[0]) / (vals.length - 1);
+    }
+  } else if (isSingleCol && srcRows.length === 1) {
+    const v = parseFloat(srcRows[0][0]);
+    if (!isNaN(v)) step = 0; // repeat the value
+  }
+
+  // Fill target cells
+  const patternLen = srcRows.length;
+  const filledCells = [];
+  let rowOffset = 0;
+  for (let r = af.selMaxR + 1; r <= af.endRow; r++) {
+    for (let c = af.selMinC; c <= af.selMaxC; c++) {
+      const cell = document.querySelector(`td.data-cell[data-ri="${r}"][data-ci="${c}"]`);
+      if (!cell) continue;
+      const srcVal = srcRows[rowOffset % patternLen][c - af.selMinC];
+      let newVal = srcVal;
+
+      // Smart numeric fill: continue the sequence
+      if (step !== null && !isNaN(parseFloat(srcVal))) {
+        const lastSrc = parseFloat(srcRows[srcRows.length - 1][0]);
+        newVal = String(Math.round((lastSrc + step * (r - af.selMaxR)) * 1000) / 1000);
+      }
+
+      cell.textContent = newVal;
+      filledCells.push(cell);
+      // Flash animation
+      cell.classList.add('autofilled');
+      setTimeout(() => cell.classList.remove('autofilled'), 600);
+    }
+    rowOffset++;
+  }
+
+  // Update selection to cover the new filled area
+  ss.er = af.endRow;
+  applySelection();
+}
+
+// ── Persistence ──
+function save(){
+  try{ localStorage.setItem('fl2_progress',JSON.stringify({curCat,progress:progress.map(s=>[...s])})); }catch(e){}
+}
+function load(){
+  try{
+    const d=JSON.parse(localStorage.getItem('fl2_progress')||'null');
+    if(!d) return;
+    if(typeof d.curCat==='number') curCat=d.curCat;
+    if(Array.isArray(d.progress)) d.progress.forEach((a,i)=>{ if(Array.isArray(a)) progress[i]=new Set(a); });
+  }catch(e){}
+}
+function confirmReset(){
+  if(confirm('Reset ALL progress? This cannot be undone.')) {
+    progress=CATS.map(()=>new Set());
+    curCat=0;curQ=0;isAnswered=false;attempts=0;
+    localStorage.removeItem('fl2_progress');
+    localStorage.removeItem('fl_scores');
+    localStorage.removeItem('fl_lb_id');
+    localStorage.removeItem('fl_lb_name');
+    myTotalPts=0; myQAnswered=0; myQCorrect=0;
+    currentStreak=0; bestStreak=0;
+    document.getElementById('lb-count').textContent='0';
+    document.getElementById('streak-badge').classList.remove('show');
+    render();
+  }
+}
+
+// ── Helpers ──
+function colLetter(ci){ return String.fromCharCode(65+ci); }
+function cellRef(r,c){ return colLetter(c)+(r+1); }
+function rangeRef(r1,c1,r2,c2){
+  const rr=[Math.min(r1,r2),Math.max(r1,r2)],cc=[Math.min(c1,c2),Math.max(c1,c2)];
+  return rr[0]===rr[1]&&cc[0]===cc[1] ? cellRef(rr[0],cc[0]) : `${cellRef(rr[0],cc[0])}:${cellRef(rr[1],cc[1])}`;
+}
+function norm(s){
+  // Normalise a formula: lowercase, remove spaces, strip leading =
+  return s.trim().toLowerCase().replace(/\s+/g,'').replace(/^=/,'');
+}
+
+// ── Score display ──
+function countTotal(){ return progress.reduce((t,s)=>t+s.size,0); }
+
+// ── Build sidebar ──
+function buildSidebar(){
+  const nav=document.getElementById('sidebar');
+  nav.innerHTML='';
+  const lbl=document.createElement('div');
+  lbl.className='sidebar-label';lbl.textContent='Skill Levels';nav.appendChild(lbl);
+
+  CATS.forEach((cat,i)=>{
+    const done=progress[i].size;
+    const btn=document.createElement('button');
+    btn.className='cat-btn'+(i===curCat?' active':'')+(done>=10?' completed':'');
+    const pct=done*10;
+    btn.innerHTML=`
+      <div class="cat-icon" style="background:${cat.color}18;color:${cat.color};font-weight:900">${done>=10?'✓':cat.icon}</div>
+      <div class="cat-info">
+        <span class="cat-name">${cat.name}</span>
+        <div class="cat-prog-row">
+          <div class="cat-prog-bar"><div class="cat-prog-fill" style="width:${pct}%;background:${done>=10?'#16a34a':cat.color}"></div></div>
+          <span class="cat-prog-text" style="${done>=10?'color:#16a34a':''}">${done}/10</span>
+        </div>
+      </div>
+      ${done>=10?'<span class="cat-check">✅</span>':''}
+    `;
+    btn.onclick=()=>{
+      curCat=i; isAnswered=false; attempts=0;
+      curQ=0;
+      for(let j=0;j<CATS[i].questions.length;j++) if(!progress[i].has(j)){curQ=j;break;}
+      render();
+    };
+    nav.appendChild(btn);
+  });
+}
+
+// ── Build progress dots ──
+function buildProgDots(){
+  const el=document.getElementById('prog-steps');
+  el.innerHTML='';
+  const done=[...progress[curCat]];
+  for(let i=0;i<10;i++){
+    const d=document.createElement('div');
+    d.className='prog-step'+(done.includes(i)?' done':(i===curQ?' current':''));
+    el.appendChild(d);
+  }
+}
+
+// ── Build spreadsheet ──
+function buildSheet(q){
+  const {headers,rows}=q.table;
+  const hl=q.hl||[];
+  ss.rows=rows; ss.headers=headers;
+  ss.ar=-1;ss.ac=-1;ss.er=-1;ss.ec=-1;ss.dragging=false;
+
+  const isHL=(r,c)=>hl.some(([hr,hc])=>hr===r&&hc===c);
+  let html=`<thead><tr><th class="corner"></th>`;
+  headers.forEach((h,ci)=>{ html+=`<th data-ci="${ci}">${h}</th>`; });
+  html+=`</tr></thead><tbody>`;
+  rows.forEach((row,ri)=>{
+    html+=`<tr><td class="rh" data-ri="${ri}">${ri+1}</td>`;
+    row.forEach((cell,ci)=>{
+      const cls=isHL(ri,ci)?'hl':'';
+      html+=`<td class="data-cell ${cls}" data-ri="${ri}" data-ci="${ci}" tabindex="0">${cell}</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody>`;
+  document.getElementById('spreadsheet').innerHTML=html;
+  document.getElementById('sel-box').style.display='none';
+  document.getElementById('sheet-namebox').textContent='';
+  document.getElementById('sheet-preview').textContent='Click or drag to select cells';
+  document.getElementById('sheet-result').style.display='none';
+
+  attachSheet();
+  initFillHandle();
+}
+
+// ── Sheet events ──
+// Global mouseup — handles both cell-selection drag and autofill drag
+document.addEventListener('mouseup', e => {
+  // Autofill takes priority
+  if (af.active) {
+    af.active = false;
+    document.body.style.cursor = '';
+    doAutofill();
+    return;
+  }
+  // Cell selection drag
+  if (ss.dragging) {
+    const wasDrag = (ss.er !== ss.ar || ss.ec !== ss.ac);
+    ss.dragging = false;
+    if (wasDrag) applySelection();
+  }
+});
+
+function attachSheet(){
+  const cells=document.querySelectorAll('td.data-cell');
+  cells.forEach(cell=>{
+    cell.addEventListener('mousedown',e=>{
+      e.preventDefault();
+      ss.ar=+cell.dataset.ri;ss.ac=+cell.dataset.ci;
+      ss.er=ss.ar;ss.ec=ss.ac;ss.dragging=true;
+      applySelection();
+    });
+    cell.addEventListener('mouseenter',()=>{
+      if(!ss.dragging)return;
+      ss.er=+cell.dataset.ri;ss.ec=+cell.dataset.ci;
+      applySelection();
+    });
+    // Touch
+    cell.addEventListener('touchstart',e=>{
+      ss.ar=+cell.dataset.ri;ss.ac=+cell.dataset.ci;
+      ss.er=ss.ar;ss.ec=ss.ac;ss.dragging=true;
+      applySelection();
+    },{passive:true});
+    cell.addEventListener('touchmove',e=>{
+      if(!ss.dragging)return;
+      const el=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY);
+      if(el&&el.classList.contains('data-cell')){
+        ss.er=+el.dataset.ri;ss.ec=+el.dataset.ci;
+        applySelection();
+      }
+    },{passive:true});
+    cell.addEventListener('touchend',()=>{ ss.dragging=false; applySelection(); });
+    // Keyboard nav
+    cell.addEventListener('keydown',e=>{
+      const moves={ArrowRight:[0,1],ArrowLeft:[0,-1],ArrowDown:[1,0],ArrowUp:[-1,0]};
+      if(!moves[e.key])return;
+      e.preventDefault();
+      const [dr,dc]=moves[e.key];
+      const nr=Math.max(0,Math.min(ss.rows.length-1,+cell.dataset.ri+dr));
+      const nc=Math.max(0,Math.min(ss.headers.length-1,+cell.dataset.ci+dc));
+      const next=document.querySelector(`td.data-cell[data-ri="${nr}"][data-ci="${nc}"]`);
+      if(next){ ss.ar=nr;ss.ac=nc;ss.er=nr;ss.ec=nc; applySelection(); next.focus(); }
+    });
+  });
+}
+
+function applySelection(){
+  if(ss.ar<0)return;
+  const rng=rangeRef(ss.ar,ss.ac,ss.er,ss.ec);
+  const [minR,maxR]=[Math.min(ss.ar,ss.er),Math.max(ss.ar,ss.er)];
+  const [minC,maxC]=[Math.min(ss.ac,ss.ec),Math.max(ss.ac,ss.ec)];
+
+  // Style cells
+  document.querySelectorAll('td.data-cell').forEach(c=>{
+    c.classList.remove('selected','in-range');
+    const r=+c.dataset.ri,cl=+c.dataset.ci;
+    if(r>=minR&&r<=maxR&&cl>=minC&&cl<=maxC){
+      c.classList.add(r===ss.ar&&cl===ss.ac?'selected':'in-range');
+    }
+  });
+  document.querySelectorAll('td.rh').forEach(c=>{
+    const r=+c.dataset.ri;
+    c.classList.toggle('row-hl',r>=minR&&r<=maxR);
+  });
+  document.querySelectorAll('th[data-ci]').forEach(c=>{
+    const ci=+c.dataset.ci;
+    c.classList.toggle('col-hl',ci>=minC&&ci<=maxC);
+  });
+
+  // Name box and preview
+  document.getElementById('sheet-namebox').textContent=rng;
+  const anchor=document.querySelector(`td.data-cell[data-ri="${ss.ar}"][data-ci="${ss.ac}"]`);
+  document.getElementById('sheet-preview').textContent=anchor?anchor.textContent.trim()||'(empty)':'';
+
+  // Draw selection box + fill handle
+  const scroll=document.getElementById('sheet-scroll');
+  const box=document.getElementById('sel-box');
+  const fh=document.getElementById('fill-handle');
+  const fc=document.querySelector(`td.data-cell[data-ri="${minR}"][data-ci="${minC}"]`);
+  const lc=document.querySelector(`td.data-cell[data-ri="${maxR}"][data-ci="${maxC}"]`);
+  if(fc&&lc){
+    const sr=scroll.getBoundingClientRect();
+    const fr=fc.getBoundingClientRect();
+    const lr=lc.getBoundingClientRect();
+    const top=fr.top-sr.top+scroll.scrollTop;
+    const left=fr.left-sr.left+scroll.scrollLeft;
+    const width=lr.right-fr.left;
+    const height=lr.bottom-fr.top;
+    box.style.cssText=`display:block;top:${top}px;left:${left}px;width:${width}px;height:${height}px`;
+    // Position fill handle at bottom-right corner of selection
+    fh.style.cssText=`display:block;top:${top+height}px;left:${left+width}px`;
+  }
+
+  // Smart formula population: append after operator, replace otherwise
+  const inp=document.getElementById('formula-input');
+  const cur=inp.value.trim();
+
+  if(!cur||cur==='='){
+    // Empty — just insert the cell/range reference
+    inp.value='='+rng;
+  } else {
+    const body=cur.replace(/^=/,'');
+    const bodyLow=body.toLowerCase();
+
+    // If formula ends with an operator or open-paren, APPEND the new ref
+    // e.g. user typed =A3* then clicks B3 → =A3*B3
+    const endsWithOperator=/[+\-*\/,(]$/.test(body.trim());
+
+    if(endsWithOperator){
+      // If ending with '(' append ref and close the paren
+      if(/\($/.test(body.trim())){
+        inp.value='='+body+rng+')';
+      } else {
+        inp.value='='+body+rng;
+      }
+    } else {
+      // Has a function like SUM( → replace the argument inside parens
+      const openP=bodyLow.indexOf('(');
+      if(openP!==-1){
+        const funcName=body.substring(0,openP);
+        inp.value='='+funcName.toUpperCase()+'('+rng+')';
+      } else {
+        // Plain reference like =A1 → replace with new ref
+        inp.value='='+rng;
+      }
+    }
+  }
+
+  // Clear incorrect (wrong) state when user picks new cells — but keep correct state
+  const wrap=document.getElementById('formula-wrap');
+  if(wrap.classList.contains('wrong')){
+    wrap.className='formula-wrap';
+    const fb=document.getElementById('feedback');
+    if(fb.classList.contains('wrong')) fb.className='feedback';
+  }
+}
+
+// ── Render question ──
+function render(){
+  const cat=CATS[curCat];
+  const done=progress[curCat].size;
+
+  buildSidebar();
+
+  // Progress bar
+  document.getElementById('prog-cat-name').textContent=`${cat.name} — ${cat.desc}`;
+  document.getElementById('prog-fraction').textContent=`${done} / 10`;
+  document.getElementById('prog-fill').style.width=`${done*10}%`;
+  buildProgDots();
+
+  // Total score
+  const t=countTotal();
+  document.getElementById('total-score').textContent=`${t} / 70 Complete`;
+
+  // Show completion or question
+  const qCard=document.getElementById('q-card');
+  const cCard=document.getElementById('completion-card');
+
+  if(done>=10){
+    qCard.style.display='none';
+    cCard.classList.add('show');
+    document.getElementById('comp-sub').innerHTML=
+      `You've mastered all 10 ${cat.name} questions!<br>
+       Completed levels: ${progress.filter(s=>s.size>=10).length} / ${CATS.length}`;
+    return;
+  }
+
+  qCard.style.display='block';
+  cCard.classList.remove('show');
+
+  // Show example modal first time entering this category (Fix 1)
+  if(!shownExamples.has(cat.id)){
+    shownExamples.add(cat.id);
+    showExample(cat.id);
+  } else {
+    // Show why banner if it's the first question in category (Fix 4)
+    const justStarted = progress[curCat].size === 0;
+    if(justStarted) showWhyBanner(cat.id);
+  }
+
+  // Find first unanswered
+  for(let i=0;i<cat.questions.length;i++) if(!progress[curCat].has(i)){curQ=i;break;}
+
+  const q=cat.questions[curQ];
+  document.getElementById('q-badge').textContent=`Q${curQ+1}`;
+  document.getElementById('q-scenario').textContent=q.scenario;
+  document.getElementById('q-text').textContent=q.text;
+  document.getElementById('q-subtext').textContent=q.subtext;
+
+  buildSheet(q);
+
+  const inp=document.getElementById('formula-input');
+  inp.value='';
+  document.getElementById('formula-wrap').className='formula-wrap';
+  const fb=document.getElementById('feedback');
+  fb.className='feedback';
+  document.getElementById('fb-icon').textContent='';
+  document.getElementById('fb-text').textContent='';
+  document.getElementById('next-btn').disabled=true;
+  document.getElementById('attempt-ind').textContent='';
+  document.getElementById('sheet-result').style.display='none';
+  isAnswered=false;
+  attempts=0;
+  startTimer();
+}
+
+// ── Fix 2: Smart error diagnosis ──
+function diagnoseError(userVal, q) {
+  const user = userVal.trim().toLowerCase().replace(/\s+/g,'');
+  const correct = q.answers[0].toLowerCase().replace(/\s+/g,'');
+
+  // Missing = sign
+  if (!user.startsWith('=')) {
+    return 'Your formula must start with <code>=</code>. Try <code>=' + q.answers[0].slice(1) + '</code>';
+  }
+
+  const body = user.slice(1);
+  const correctBody = correct.slice(1);
+
+  // Detect what function they should be using
+  const correctFn = correctBody.match(/^([a-z]+)\(/)?.[1]?.toUpperCase();
+  const userFn = body.match(/^([a-z]+)\(/)?.[1]?.toUpperCase();
+
+  // Used wrong function entirely
+  if (correctFn && userFn && correctFn !== userFn) {
+    return `You used <code>${userFn}</code> but this question needs <code>${correctFn}</code>.`;
+  }
+
+  // Should have used a function but didn't
+  if (correctFn && !userFn && !body.includes(correctFn.toLowerCase())) {
+    return `This question needs the <code>${correctFn}()</code> function. Start with <code>=${correctFn}(</code>`;
+  }
+
+  // Missing closing bracket
+  if (body.includes('(') && !body.includes(')')) {
+    return 'Missing closing bracket <code>)</code> at the end of your formula.';
+  }
+
+  // Comma instead of colon in range
+  if (body.match(/[a-z]\d+,[a-z]\d+/)) {
+    return 'Use a colon <code>:</code> between cell references for a range, not a comma. Example: <code>A1:A5</code>';
+  }
+
+  // Colon instead of comma (reversed)
+  if (body.match(/[a-z]\d+:[a-z]\d+:[a-z]\d+/)) {
+    return 'Too many colons — a range only has one colon. Example: <code>A1:A5</code>';
+  }
+
+  // Space inside formula
+  if (body.includes(' ')) {
+    return 'Remove spaces from inside your formula — spreadsheet formulas have no spaces.';
+  }
+
+  // Wrong cells referenced
+  const correctCells = [...correctBody.matchAll(/[a-z]\d+/g)].map(m=>m[0]);
+  const userCells = [...body.matchAll(/[a-z]\d+/g)].map(m=>m[0]);
+  const missingCells = correctCells.filter(c => !userCells.includes(c));
+  const extraCells = userCells.filter(c => !correctCells.includes(c));
+
+  if (missingCells.length > 0 && extraCells.length > 0) {
+    return `Check your cell references — you used <code>${extraCells[0].toUpperCase()}</code> but the question highlights <code>${missingCells[0].toUpperCase()}</code>.`;
+  }
+
+  if (missingCells.length > 0) {
+    return `Make sure your range includes <code>${missingCells[0].toUpperCase()}</code>.`;
+  }
+
+  // Range direction wrong (e.g. A5:A1 instead of A1:A5) — still valid but worth noting
+  const rangeMatch = body.match(/([a-z])(\d+):([a-z])(\d+)/);
+  if (rangeMatch) {
+    const r1 = parseInt(rangeMatch[2]), r2 = parseInt(rangeMatch[4]);
+    if (r1 > r2) return `Your range is backwards — try <code>${rangeMatch[3].toUpperCase()}${r2}:${rangeMatch[1].toUpperCase()}${r1}</code> instead.`;
+  }
+
+  // Generic fallback
+  return `Double-check your formula against the highlighted cells. ${q.subtext}`;
+}
+
+// ── Check answer ──
+function checkAnswer(){
+  if(isAnswered)return;
+  const q=CATS[curCat].questions[curQ];
+  const inp=document.getElementById('formula-input');
+  const val=inp.value.trim();
+  if(!val||val==='='){inp.focus();return;}
+
+  attempts++;
+  document.getElementById('attempt-ind').textContent=attempts>1?`Attempt ${attempts}`:'';
+
+  const userNorm=norm(val);
+  const correct=q.answers.some(a=>norm(a)===userNorm);
+  const wrap=document.getElementById('formula-wrap');
+  const fb=document.getElementById('feedback');
+  const icon=document.getElementById('fb-icon');
+  const txt=document.getElementById('fb-text');
+
+  if(correct){
+    wrap.className='formula-wrap correct';
+    fb.className='feedback correct show';
+    icon.textContent='✅';
+    txt.textContent=attempts===1
+      ? 'Perfect! Correct on the first try!'
+      : `Correct! You got it in ${attempts} attempt${attempts>1?'s':''}.`;
+
+    // Score: stop timer and award points
+    stopTimer();
+    const elapsed = getElapsedSeconds();
+    const pts = calcScore(elapsed, attempts);
+    showScoreToast(pts, elapsed, attempts);
+
+    // Fix 3: Pulse-animate all highlighted cells to show the formula "working"
+    const hlCells = document.querySelectorAll('td.data-cell.hl');
+    hlCells.forEach((cell, i) => {
+      setTimeout(() => {
+        cell.classList.add('pulse-correct');
+        setTimeout(() => cell.classList.remove('pulse-correct'), 700);
+      }, i * 80);
+    });
+
+    // Show what the formula calculates in the toolbar
+    const resEl=document.getElementById('sheet-result');
+    if(q.resultLabel){ resEl.textContent='= '+q.resultLabel; resEl.style.display='flex'; }
+
+    document.getElementById('next-btn').disabled=false;
+    isAnswered=true;
+    progress[curCat].add(curQ);
+    save();
+
+    const done=progress[curCat].size;
+    document.getElementById('prog-fraction').textContent=`${done} / 10`;
+    document.getElementById('prog-fill').style.width=`${done*10}%`;
+    buildProgDots();
+    buildSidebar();
+    document.getElementById('total-score').textContent=`${countTotal()} / 70 Complete`;
+
+  } else {
+    // Fix 2: smart diagnosis on every wrong attempt
+    const diagnosis = diagnoseError(val, q);
+
+    // Break streak on 2nd wrong attempt (gave them one grace)
+    if (attempts >= 2) breakStreak();
+
+    if(attempts >= 3){
+      fb.className='feedback hint show';
+      icon.textContent='💡';
+      txt.innerHTML=`<strong>Hint:</strong> ${diagnosis}<div class="feedback-detail">Still stuck? <a href="https://excelexercises.com/excel-functions.html" target="_blank" rel="noopener">Open reference guide ↗</a></div>`;
+    } else {
+      wrap.className='formula-wrap wrong';
+      fb.className='feedback wrong show';
+      icon.textContent='❌';
+      txt.innerHTML=`<strong>Not quite.</strong> <span class="feedback-detail">${diagnosis}</span>`;
+    }
+    setTimeout(()=>{ wrap.className='formula-wrap'; },500);
+  }
+}
+
+// ── Next question ──
+function nextQuestion(){
+  if(!isAnswered)return;
+  isAnswered=false; attempts=0;
+  const done=progress[curCat].size;
+  if(done>=10){
+    render(); return;
+  }
+  for(let i=0;i<CATS[curCat].questions.length;i++) if(!progress[curCat].has(i)){curQ=i;break;}
+
+  const q=CATS[curCat].questions[curQ];
+  document.getElementById('q-badge').textContent=`Q${curQ+1}`;
+  document.getElementById('q-scenario').textContent=q.scenario;
+  document.getElementById('q-text').textContent=q.text;
+  document.getElementById('q-subtext').textContent=q.subtext;
+  buildSheet(q);
+
+  const inp=document.getElementById('formula-input');
+  inp.value='';
+  document.getElementById('formula-wrap').className='formula-wrap';
+  document.getElementById('feedback').className='feedback';
+  document.getElementById('fb-icon').textContent='';
+  document.getElementById('fb-text').textContent='';
+  document.getElementById('next-btn').disabled=true;
+  document.getElementById('attempt-ind').textContent='';
+  document.getElementById('sheet-result').style.display='none';
+  buildProgDots();
+  startTimer();
+  inp.focus();
+}
+
+// ── Next category ──
+function nextCategory(){
+  if(curCat<CATS.length-1){
+    curCat++;
+    for(let i=0;i<CATS[curCat].questions.length;i++) if(!progress[curCat].has(i)){curQ=i;break;}
+    isAnswered=false;attempts=0;
+    render();
+  } else {
+    // All 70 done
+    const allDone=progress.every(s=>s.size>=10);
+    if(allDone){
+      document.getElementById('name-overlay').classList.add('show');
+      setTimeout(()=>document.getElementById('name-input').focus(),100);
+    }
+  }
+}
+
+// ── Formula input guard ──
+document.addEventListener('DOMContentLoaded',()=>{
+  const inp=document.getElementById('formula-input');
+  // Keep leading = present
+  inp.addEventListener('input',()=>{
+    if(inp.value.length>0&&!inp.value.startsWith('=')){
+      const p=inp.selectionStart;
+      inp.value='='+inp.value.replace(/^=*/,'');
+      inp.setSelectionRange(p+1,p+1);
+    }
+  });
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){ if(isAnswered)nextQuestion(); else checkAnswer(); }
+  });
+  inp.addEventListener('focus',()=>{
+    setTimeout(()=>inp.scrollIntoView({behavior:'smooth',block:'nearest'}),300);
+  });
+
+  // Name input enter
+  const ni=document.getElementById('name-input');
+  ni.addEventListener('keydown',e=>{ if(e.key==='Enter')generateCert(); });
+  ni.addEventListener('input',()=>ni.classList.remove('error'));
+
+  restoreLbSession();
+  load();
+  render();
+});
+
+// ── Certificate ──
+function generateCert(){
+  const name=document.getElementById('name-input').value.trim();
+  if(!name){ document.getElementById('name-input').classList.add('error'); return; }
+  document.getElementById('name-overlay').classList.remove('show');
+  document.getElementById('cert-name').textContent=name;
+  document.getElementById('cert-score').textContent=`✓ ${countTotal()} / 70 — All Levels Passed`;
+  document.getElementById('cert-date').textContent=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('cert-overlay').classList.add('show');
+  launchConfetti();
+}
+function closeCert(){
+  document.getElementById('cert-overlay').classList.remove('show');
+  document.getElementById('confetti-wrap').innerHTML='';
+}
+function downloadCert(){
+  const btn=document.getElementById('dl-btn');
+  btn.innerHTML='⏳ Generating…'; btn.disabled=true;
+  const cert=document.getElementById('certificate');
+  html2canvas(cert,{scale:3,useCORS:true,backgroundColor:'#fff',logging:false,
+    onclone:doc=>{
+      const s=doc.createElement('style');
+      s.textContent='*{animation:none!important;transition:none!important}';
+      doc.head.appendChild(s);
+    }
+  }).then(canvas=>{
+    const safe=document.getElementById('cert-name').textContent.replace(/[^a-z0-9]/gi,'_').toLowerCase();
+    const a=document.createElement('a');
+    a.download=`FormulaLab_Certificate_${safe}.png`;
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+    btn.innerHTML='✅ Downloaded!';
+    setTimeout(()=>{btn.innerHTML='⬇ Download PNG';btn.disabled=false;},2500);
+  }).catch(()=>{
+    btn.innerHTML='⬇ Download PNG'; btn.disabled=false;
+    alert('Download failed — try Print instead.');
+  });
+}
+function launchConfetti(){
+  const wrap=document.getElementById('confetti-wrap');
+  wrap.innerHTML='';
+  const colors=['#4f46e5','#2563eb','#16a34a','#dc2626','#d97706','#0891b2','#7c3aed','#db2777'];
+  for(let i=0;i<140;i++){
+    const el=document.createElement('div');
+    el.className='cp';
+    const c=colors[Math.floor(Math.random()*colors.length)];
+    const size=5+Math.random()*9;
+    const isCircle=Math.random()>0.5;
+    el.style.cssText=`
+      left:${Math.random()*100}%;
+      width:${size}px;height:${size}px;
+      background:${c};
+      border-radius:${isCircle?'50%':'2px'};
+      animation-duration:${2+Math.random()*2.5}s;
+      animation-delay:${Math.random()*1.8}s;
+    `;
+    wrap.appendChild(el);
+  }
+  setTimeout(()=>wrap.innerHTML='',6000);
+}
+</script>
+</body>
+</html>
