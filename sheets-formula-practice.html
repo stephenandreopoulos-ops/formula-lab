@@ -2625,37 +2625,64 @@ function load(){
 // Format: base64 of JSON {v:1, p:[[0,2,5],[0,1],...], c:curCat, pts:myTotalPts, q:myQAnswered, s:bestStreak}
 // Each category's completed question indices stored as array
 
+// ── Save code: pure hex encoding, no base64 ambiguity ──
+// Format: V1-[7 x 10-bit bitmask as 3 hex chars each]-[pts hex]-[cat]-[streak]-[name]
+// Example: FL-3FF-000-1FF-000-000-000-000-5DC-2-5-Alex
+
 function generateSaveCode() {
-  const data = {
-    v: 1,
-    p: progress.map(s => [...s].sort((a,b)=>a-b)),
-    c: curCat,
-    pts: myTotalPts,
-    q: myQAnswered,
-    s: bestStreak,
-    n: myName || ''
-  };
   try {
-    const json = JSON.stringify(data);
-    // btoa needs ASCII — use encodeURIComponent trick for safety
-    const code = btoa(encodeURIComponent(json))
-      .replace(/=/g,'')       // remove padding
-      .replace(/\+/g,'-')     // url-safe
-      .replace(/\//g,'_');
-    // Break into groups of 6 for readability: XXXXXX-XXXXXX-XXXXXX
-    return code.match(/.{1,6}/g).join('-').toUpperCase();
+    // 7 categories, each with a 10-bit bitmask of completed questions
+    const masks = progress.map(s => {
+      let mask = 0;
+      for (const q of s) mask |= (1 << q);
+      return mask.toString(16).toUpperCase().padStart(3,'0');
+    });
+    // Points as hex (max 99999 = 0x1869F, 5 chars)
+    const pts = Math.min(myTotalPts, 0xFFFFF).toString(16).toUpperCase().padStart(5,'0');
+    // Category (0-6), streak (0-99), name (alphanumeric only, max 12 chars)
+    const cat = curCat.toString();
+    const str = Math.min(bestStreak, 99).toString();
+    const name = (myName || '').replace(/[^a-zA-Z0-9]/g,'').slice(0,12) || 'Student';
+    // Assemble: FL-[7 masks]-[pts]-[cat]-[str]-[name]
+    return 'FL-' + masks.join('-') + '-' + pts + '-' + cat + '-' + str + '-' + name;
   } catch(e) { return 'ERROR'; }
 }
 
 function parseSaveCode(raw) {
   try {
-    // Clean up: remove spaces, dashes, lowercase
-    const clean = raw.replace(/[\s\-]/g,'').toLowerCase()
-      .replace(/-/g,'+').replace(/_/g,'/');
-    // Re-add base64 padding
-    const padded = clean + '==='.slice(0, (4 - clean.length % 4) % 4);
-    const json = decodeURIComponent(atob(padded));
-    return JSON.parse(json);
+    // Strip spaces, uppercase
+    const s = raw.replace(/\s/g,'').toUpperCase();
+    // Must start with FL-
+    if (!s.startsWith('FL-')) return null;
+    const parts = s.slice(3).split('-');
+    // Need at least 10 parts: 7 masks + pts + cat + streak (name optional)
+    if (parts.length < 10) return null;
+    const masks = parts.slice(0,7);
+    const pts   = parts[7];
+    const cat   = parts[8];
+    const str   = parts[9];
+    const name  = parts.slice(10).join('') || '';
+    // Decode bitmasks back to arrays of question indices
+    const p = masks.map(hex => {
+      const mask = parseInt(hex, 16);
+      if (isNaN(mask)) return [];
+      const arr = [];
+      for (let i = 0; i < 10; i++) { if (mask & (1 << i)) arr.push(i); }
+      return arr;
+    });
+    const ptsNum = parseInt(pts, 16);
+    const catNum = parseInt(cat, 10);
+    const strNum = parseInt(str, 10);
+    if (isNaN(ptsNum) || isNaN(catNum) || isNaN(strNum)) return null;
+    return {
+      v: 1,
+      p,
+      c: Math.min(catNum, 6),
+      pts: ptsNum,
+      q: p.reduce((t,a)=>t+a.length, 0),
+      s: strNum,
+      n: name.charAt(0) + name.slice(1).toLowerCase()
+    };
   } catch(e) { return null; }
 }
 
